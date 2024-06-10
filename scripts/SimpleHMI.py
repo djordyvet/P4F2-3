@@ -1,8 +1,3 @@
-﻿import tkinter as tk
-from tkinter import messagebox
-import rospy
-from std_msgs.msg import Int32, Bool
-
 class HMIApp:
     def __init__(self, root):
         self.root = root
@@ -47,49 +42,59 @@ class HMIApp:
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
 
-   def start_process(self):
-    if not self.process_running:
-        self.process_running = True
-        self.start_button.config(state="disabled")
-        self.stop_button.config(state="normal")
-        self.signal_publisher.publish(True)  # Publish start signal
-        self.process_id = self.root.after(1000, self.update_counter)
-        # Publish start message as a ROS message
-        start_msg = Bool()
-        start_msg.data = True
-        self.signal_publisher.publish(start_msg)
+    def start_process(self):
+        if not self.process_running:
+            self.process_running = True
+            self.start_button.config(state="disabled")
+            self.stop_button.config(state="normal")
+            self.signal_publisher.publish(True)  # Publish start signal
+            self.process_id = self.root.after(1000, self.update_counter)
+            # Publish start message as a ROS message
+            start_msg = Bool()
+            start_msg.data = True
+            self.signal_publisher.publish(start_msg)
 
-def stop_process(self):
-    if self.process_running:
-        self.process_running = False
-        self.start_button.config(state="normal")
-        self.stop_button.config(state="disabled")
-        self.signal_publisher.publish(False)  # Publish stop signal
-        if self.process_id:
-            self.root.after_cancel(self.process_id)
-        # Publish stop message as a ROS message
-        stop_msg = Bool()
-        stop_msg.data = True
-        self.signal_publisher.publish(stop_msg)
+    def stop_process(self):
+        if self.process_running:
+            self.process_running = False
+            self.start_button.config(state="normal")
+            self.stop_button.config(state="disabled")
+            self.signal_publisher.publish(False)  # Publish stop signal
+            if self.process_id:
+                self.root.after_cancel(self.process_id)
+            # Publish stop message as a ROS message
+            stop_msg = Bool()
+            stop_msg.data = True
+            self.signal_publisher.publish(stop_msg)
 
-   def update_slider_label(self, value):
-    self.selected_option = int(value)
-    self.selected_option_label.config(text=f"Selected Option: {value}")
+    def reset_process(self):
+        self.counter_value = 0
+        self.counter_label.config(text=f"Counter: {self.counter_value}")
 
-    # Update light indicator
-    if self.selected_option == 1:
-        self.light_indicator.config(text="⚪", fg="red")
-    elif self.selected_option == 2:
-        self.light_indicator.config(text="⚪", fg="yellow")
-    elif self.selected_option == 3:
-        self.light_indicator.config(text="⚪", fg="green")
-    elif self.selected_option == 4:
-        self.light_indicator.config(text="⚪", fg="blue")
-    elif self.selected_option == 5:
-        self.light_indicator.config(text="⚪", fg="purple")
+    def update_counter(self):
+        if self.process_running:
+            self.counter_value += 1
+            self.counter_label.config(text=f"Counter: {self.counter_value}")
+            self.process_id = self.root.after(1000, self.update_counter)
 
-    # Publish selected option to ROS
-    self.choice_publisher.publish(self.selected_option)
+    def update_slider_label(self, value):
+        self.selected_option = int(value)
+        self.selected_option_label.config(text=f"Selected Option: {value}")
+
+        # Update light indicator
+        if self.selected_option == 1:
+            self.light_indicator.config(text="⚪", fg="red")
+        elif self.selected_option == 2:
+            self.light_indicator.config(text="⚪", fg="yellow")
+        elif self.selected_option == 3:
+            self.light_indicator.config(text="⚪", fg="green")
+        elif self.selected_option == 4:
+            self.light_indicator.config(text="⚪", fg="blue")
+        elif self.selected_option == 5:
+            self.light_indicator.config(text="⚪", fg="purple")
+
+        # Publish selected option to ROS
+        self.choice_publisher.publish(self.selected_option)
 
 if __name__ == "__main__":
     root = tk.Tk()
