@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import tkinter as tk
-
-
+import Tkinter as tk
+import rospy
+from std_msgs.msg import Int32, Bool
 
 class HMIApp:
     def __init__(self, root):
@@ -10,7 +10,7 @@ class HMIApp:
 
         # Counter
         self.counter_value = 0
-        self.counter_label = tk.Label(root, text="Counter: 0", font=("Helvetica", 16))
+        self.counter_label = tk.Label(root, text="Counter: " + str(self.counter_value), font=("Helvetica", 16))
         self.counter_label.pack(pady=10)
 
         # Buttons
