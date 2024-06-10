@@ -70,17 +70,17 @@ class HMIApp:
 
     def reset_process(self):
         self.counter_value = 0
-        self.counter_label.config(text=f"Counter: {self.counter_value}")
+        self.counter_label.config(text="Counter: " + str(self.counter_value))
 
     def update_counter(self):
         if self.process_running:
             self.counter_value += 1
-            self.counter_label.config(text=f"Counter: {self.counter_value}")
+            self.counter_label.config(text="Counter: " + str(self.counter_value))
             self.process_id = self.root.after(1000, self.update_counter)
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
-        self.selected_option_label.config(text=f"Selected Option: {value}")
+        self.selected_option_label.config(text="Selected Option: " + str(value))
 
         # Update light indicator
         if self.selected_option == 1:
