@@ -66,7 +66,7 @@ class HMIApp:
 
     def reset_process(self):
         self.counter_value = 0
-        self.counter_label.config(text=f"Counter: {self.counter_value}")
+        self.counter_label.config(text=f"Counter: {self.counter_value})
 
     def update_counter(self):
         if self.process_running:
