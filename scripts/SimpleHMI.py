@@ -74,24 +74,24 @@ class HMIApp:
             self.counter_label.config(text=f"Counter: {self.counter_value}")
             self.process_id = self.root.after(1000, self.update_counter)
 
-    def update_slider_label(self, value):
-        self.selected_option = int(value)
-        self.selected_option_label.config(text=f"Selected Option: {value}")
+   def update_slider_label(self, value):
+    self.selected_option = int(value)
+    self.selected_option_label.config(text=f"Selected Option: {value}")
 
-        # Update light indicator
-        if self.selected_option == 1:
-            self.light_indicator.config(fg="red")
-        elif self.selected_option == 2:
-            self.light_indicator.config(fg="yellow")
-        elif self.selected_option == 3:
-            self.light_indicator.config(fg="green")
-        elif self.selected_option == 4:
-            self.light_indicator.config(fg="blue")
-        elif self.selected_option == 5:
-            self.light_indicator.config(fg="purple")
+    # Update light indicator
+    if self.selected_option == 1:
+        self.light_indicator.config(text="⚪", fg="red")
+    elif self.selected_option == 2:
+        self.light_indicator.config(text="⚪", fg="yellow")
+    elif self.selected_option == 3:
+        self.light_indicator.config(text="⚪", fg="green")
+    elif self.selected_option == 4:
+        self.light_indicator.config(text="⚪", fg="blue")
+    elif self.selected_option == 5:
+        self.light_indicator.config(text="⚪", fg="purple")
 
-        # Publish selected option to ROS
-        self.choice_publisher.publish(self.selected_option)
+    # Publish selected option to ROS
+    self.choice_publisher.publish(self.selected_option)
 
 if __name__ == "__main__":
     root = tk.Tk()
