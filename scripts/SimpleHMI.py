@@ -39,8 +39,9 @@ class HMIApp:
         self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
         self.status_indicator.pack(pady=10)
         
-        self.slider_indicator = tk.Label(root, text="⚪", font=("Helvetica", 20), fg="grey")
-        self.slider_indicator.pack(pady=10)
+        self.slider_name_box = tk.Entry(root, font=("Helvetica", 14))
+        self.slider_name_box.pack(pady=10)
+        self.update_slider_label("1")  # Initialize the name box with the first option
 
         # Coordinates Text Boxes
         self.coord_frame = tk.Frame(root)
@@ -116,17 +117,11 @@ class HMIApp:
         self.selected_option = int(value)
         self.selected_option_label.config(text="Selected Option: " + str(value))
 
-        # Update slider indicator color based on selected option
-        if self.selected_option == 1:
-            self.slider_indicator.config(fg="red")
-        elif self.selected_option == 2:
-            self.slider_indicator.config(fg="yellow")
-        elif self.selected_option == 3:
-            self.slider_indicator.config(fg="green")
-        elif self.selected_option == 4:
-            self.slider_indicator.config(fg="blue")
-        elif self.selected_option == 5:
-            self.slider_indicator.config(fg="purple")
+        # Update slider name box based on selected option
+        names = {1: "Option 1", 2: "Option 2", 3: "Option 3", 4: "Option 4", 5: "Option 5"}
+        name = names.get(self.selected_option, "Unknown")
+        self.slider_name_box.delete(0, tk.END)
+        self.slider_name_box.insert(0, name)
 
         # Publish selected option to ROS
         self.choice_publisher.publish(self.selected_option)
