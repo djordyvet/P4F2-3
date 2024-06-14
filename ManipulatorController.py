@@ -57,7 +57,7 @@ class NiryoNedController:
             self.arm_group.clear_pose_targets()
             self.publish_xyz_position()
         else:
-            rospy.logwarn(f"Position '{position_name}' not found in the positions file.")
+            rospy.logwarn("Position '{}' not found in the positions file.".format(position_name))
 
     def go_to_xyz(self, x, y, z):
         """
@@ -89,6 +89,14 @@ class NiryoNedController:
         position = [current_pose.position.x, current_pose.position.y, current_pose.position.z]
         rospy.loginfo(f"Current position: {position}")
         self.xyz_publisher.publish(Float32MultiArray(data=position))
+    
+    def output_joint_positions(self, output_file):
+    """
+    Output the current joint positions in the terminal and log file
+    """
+    joint_positions = self.arm_group.get_current_joint_values()
+    with open(output_file, 'a') as f:	
+        f.write("current joint position: {}\n".format(joint_positions))
 
     def shutdown(self):
         """
