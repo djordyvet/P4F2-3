@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import Tkinter as tk
 import rospy
-from std_msgs.msg import Int32, Bool
+from std_msgs.msg import Int32, Bool, Float32
 
 class HMIApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("HMI with Counter, Buttons, and Slider")
+        self.root.title("HMI with Counter, Buttons, Slider, and Coordinates")
 
         # Counter
         self.counter_value = 0
@@ -38,6 +38,18 @@ class HMIApp:
         self.light_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
         self.light_indicator.pack(pady=10)
 
+        # Coordinates Text Boxes
+        self.coord_frame = tk.Frame(root)
+        self.coord_frame.pack(pady=10)
+        self.x_coord_label = tk.Label(self.coord_frame, text="X Coordinate:", font=("Helvetica", 12))
+        self.x_coord_label.grid(row=0, column=0, padx=5)
+        self.x_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
+        self.x_coord_text.grid(row=0, column=1, padx=5)
+        self.y_coord_label = tk.Label(self.coord_frame, text="Y Coordinate:", font=("Helvetica", 12))
+        self.y_coord_label.grid(row=1, column=0, padx=5)
+        self.y_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
+        self.y_coord_text.grid(row=1, column=1, padx=5)
+
         # Process Variables
         self.process_running = False
         self.process_id = None
@@ -46,6 +58,7 @@ class HMIApp:
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
+        rospy.Subscriber('coordinates', Float32, self.coordinates_callback)
         
         # Run Tkinter main loop in a way that doesn't block ROS callbacks
         self.root.after(100, self.ros_spin)
@@ -109,6 +122,13 @@ class HMIApp:
 
         # Publish selected option to ROS
         self.choice_publisher.publish(self.selected_option)
+
+    def coordinates_callback(self, msg):
+        # Assume msg is a tuple or a similar structure with x and y attributes
+        self.x_coord_text.delete(0, tk.END)
+        self.x_coord_text.insert(0, str(msg.x))
+        self.y_coord_text.delete(0, tk.END)
+        self.y_coord_text.insert(0, str(msg.y))
 
     def ros_spin(self):
         # Allow ROS to process incoming messages
