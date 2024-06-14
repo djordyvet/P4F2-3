@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import Tkinter as tk
 import rospy
-from std_msgs.msg import Int32, Bool, Float32
+from std_msgs.msg import Int32, Bool
+from geometry_msgs.msg import Point  # Assuming the coordinates are published as geometry_msgs/Point
 
 class HMIApp:
     def __init__(self, root):
@@ -34,9 +35,12 @@ class HMIApp:
         self.selected_option_label = tk.Label(root, text="Selected Option: 1", font=("Helvetica", 14))
         self.selected_option_label.pack(pady=10)
 
-        # Light Indicator
-        self.light_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
-        self.light_indicator.pack(pady=10)
+        # Light Indicators
+        self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
+        self.status_indicator.pack(pady=10)
+        
+        self.slider_indicator = tk.Label(root, text="⚪", font=("Helvetica", 20), fg="grey")
+        self.slider_indicator.pack(pady=10)
 
         # Coordinates Text Boxes
         self.coord_frame = tk.Frame(root)
@@ -49,6 +53,10 @@ class HMIApp:
         self.y_coord_label.grid(row=1, column=0, padx=5)
         self.y_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
         self.y_coord_text.grid(row=1, column=1, padx=5)
+        self.z_coord_label = tk.Label(self.coord_frame, text="Z Coordinate:", font=("Helvetica", 12))
+        self.z_coord_label.grid(row=2, column=0, padx=5)
+        self.z_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
+        self.z_coord_text.grid(row=2, column=1, padx=5)
 
         # Process Variables
         self.process_running = False
@@ -58,7 +66,7 @@ class HMIApp:
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
-        rospy.Subscriber('coordinates', Float32, self.coordinates_callback)
+        rospy.Subscriber('coordinates', Point, self.coordinates_callback)  # Assuming the topic 'coordinates' publishes geometry_msgs/Point
         
         # Run Tkinter main loop in a way that doesn't block ROS callbacks
         self.root.after(100, self.ros_spin)
@@ -74,8 +82,8 @@ class HMIApp:
             start_msg = Bool()
             start_msg.data = True
             self.signal_publisher.publish(start_msg)
-            # Update light indicator to Running
-            self.light_indicator.config(text="Running", fg="green")
+            # Update status indicator to Running
+            self.status_indicator.config(text="Running", fg="green")
 
     def stop_process(self):
         if self.process_running:
@@ -89,14 +97,14 @@ class HMIApp:
             stop_msg = Bool()
             stop_msg.data = False
             self.signal_publisher.publish(stop_msg)
-            # Update light indicator to Stopped
-            self.light_indicator.config(text="Stopped", fg="red")
+            # Update status indicator to Stopped
+            self.status_indicator.config(text="Stopped", fg="red")
 
     def reset_process(self):
         self.counter_value = 0
         self.counter_label.config(text="Counter: " + str(self.counter_value))
-        # Update light indicator to Idle
-        self.light_indicator.config(text="Idle", fg="grey")
+        # Update status indicator to Idle
+        self.status_indicator.config(text="Idle", fg="grey")
 
     def update_counter(self):
         if self.process_running:
@@ -108,27 +116,29 @@ class HMIApp:
         self.selected_option = int(value)
         self.selected_option_label.config(text="Selected Option: " + str(value))
 
-        # Update light indicator color based on selected option
+        # Update slider indicator color based on selected option
         if self.selected_option == 1:
-            self.light_indicator.config(fg="red")
+            self.slider_indicator.config(fg="red")
         elif self.selected_option == 2:
-            self.light_indicator.config(fg="yellow")
+            self.slider_indicator.config(fg="yellow")
         elif self.selected_option == 3:
-            self.light_indicator.config(fg="green")
+            self.slider_indicator.config(fg="green")
         elif self.selected_option == 4:
-            self.light_indicator.config(fg="blue")
+            self.slider_indicator.config(fg="blue")
         elif self.selected_option == 5:
-            self.light_indicator.config(fg="purple")
+            self.slider_indicator.config(fg="purple")
 
         # Publish selected option to ROS
         self.choice_publisher.publish(self.selected_option)
 
     def coordinates_callback(self, msg):
-        # Assume msg is a tuple or a similar structure with x and y attributes
+        # Update the text boxes with the coordinates
         self.x_coord_text.delete(0, tk.END)
         self.x_coord_text.insert(0, str(msg.x))
         self.y_coord_text.delete(0, tk.END)
         self.y_coord_text.insert(0, str(msg.y))
+        self.z_coord_text.delete(0, tk.END)
+        self.z_coord_text.insert(0, str(msg.z))
 
     def ros_spin(self):
         # Allow ROS to process incoming messages
