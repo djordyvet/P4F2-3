@@ -55,7 +55,7 @@ class NiryoNedController:
             self.arm_group.go(joint_goal, wait=True)
             self.arm_group.stop()
             self.arm_group.clear_pose_targets()
-            self.publish_xyz_position()
+            self.output_xyz_position()
         else:
             rospy.logwarn("Position '{}' not found in the positions file.".format(position_name))
 
@@ -79,9 +79,9 @@ class NiryoNedController:
         self.arm_group.go(wait=True)
         self.arm_group.stop()
         self.arm_group.clear_pose_targets()
-        self.publish_xyz_position()
+        self.output_xyz_position()
 
-    def publish_xyz_position(self):
+    def ouptus_xyz_position(self):
         """
         Publish the current XYZ coordinates of the end-effector.
         """
