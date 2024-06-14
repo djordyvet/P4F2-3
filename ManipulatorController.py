@@ -7,6 +7,7 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 import json
 from pyniryo import NiryoRobot
+from std_msgs.msg import Float32MultiArray
 
 class NiryoNedController:
     def __init__(self, robot_ip, positions_file):
@@ -28,6 +29,9 @@ class NiryoNedController:
             moveit_msgs.msg.DisplayTrajectory, 
             queue_size=1
         )
+
+        # Publisher for the end-effector's XYZ coordinates
+        self.xyz_publisher = rospy.Publisher('/end_effector_position', Float32MultiArray, queue_size=10)
         
         # Connect to the physical robot
         self.pyrobot = NiryoRobot(robot_ip)
@@ -51,6 +55,7 @@ class NiryoNedController:
             self.arm_group.go(joint_goal, wait=True)
             self.arm_group.stop()
             self.arm_group.clear_pose_targets()
+            self.publish_xyz_position()
         else:
             rospy.logwarn(f"Position '{position_name}' not found in the positions file.")
 
@@ -74,6 +79,16 @@ class NiryoNedController:
         self.arm_group.go(wait=True)
         self.arm_group.stop()
         self.arm_group.clear_pose_targets()
+        self.publish_xyz_position()
+
+    def publish_xyz_position(self):
+        """
+        Publish the current XYZ coordinates of the end-effector.
+        """
+        current_pose = self.arm_group.get_current_pose().pose
+        position = [current_pose.position.x, current_pose.position.y, current_pose.position.z]
+        rospy.loginfo(f"Current position: {position}")
+        self.xyz_publisher.publish(Float32MultiArray(data=position))
 
     def shutdown(self):
         """
@@ -97,7 +112,6 @@ def get_user_choice():
         return get_user_choice()
 
 def main():
-    # Replace with the actual IP address of your robot
     robot_ip = "10.10.10.10"  
     positions_file = "standard_positions.json"
     controller = NiryoNedController(robot_ip, positions_file)
