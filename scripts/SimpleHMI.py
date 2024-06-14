@@ -41,7 +41,6 @@ class HMIApp:
         
         self.slider_name_box = tk.Entry(root, font=("Helvetica", 14))
         self.slider_name_box.pack(pady=10)
-        self.update_slider_label("1")  # Initialize the name box with the first option
 
         # Coordinates Text Boxes
         self.coord_frame = tk.Frame(root)
@@ -68,6 +67,9 @@ class HMIApp:
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
         rospy.Subscriber('coordinates', Point, self.coordinates_callback)  # Assuming the topic 'coordinates' publishes geometry_msgs/Point
+        
+        # Initialize the name box with the first option
+        self.update_slider_label("1")
         
         # Run Tkinter main loop in a way that doesn't block ROS callbacks
         self.root.after(100, self.ros_spin)
