@@ -35,7 +35,7 @@ class HMIApp:
         self.selected_option_label.pack(pady=10)
 
         # Light Indicator
-        self.light_indicator = tk.Label(root, text="⚪", font=("Helvetica", 20), fg="grey")
+        self.light_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
         self.light_indicator.pack(pady=10)
 
         # Process Variables
@@ -46,6 +46,9 @@ class HMIApp:
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
+        
+        # Run Tkinter main loop in a way that doesn't block ROS callbacks
+        self.root.after(100, self.ros_spin)
 
     def start_process(self):
         if not self.process_running:
@@ -58,6 +61,8 @@ class HMIApp:
             start_msg = Bool()
             start_msg.data = True
             self.signal_publisher.publish(start_msg)
+            # Update light indicator to Running
+            self.light_indicator.config(text="Running", fg="green")
 
     def stop_process(self):
         if self.process_running:
@@ -69,12 +74,16 @@ class HMIApp:
                 self.root.after_cancel(self.process_id)
             # Publish stop message as a ROS message
             stop_msg = Bool()
-            stop_msg.data = True
+            stop_msg.data = False
             self.signal_publisher.publish(stop_msg)
+            # Update light indicator to Stopped
+            self.light_indicator.config(text="Stopped", fg="red")
 
     def reset_process(self):
         self.counter_value = 0
         self.counter_label.config(text="Counter: " + str(self.counter_value))
+        # Update light indicator to Idle
+        self.light_indicator.config(text="Idle", fg="grey")
 
     def update_counter(self):
         if self.process_running:
@@ -86,20 +95,26 @@ class HMIApp:
         self.selected_option = int(value)
         self.selected_option_label.config(text="Selected Option: " + str(value))
 
-        # Update light indicator
+        # Update light indicator color based on selected option
         if self.selected_option == 1:
-            self.light_indicator.config(text="⚪", fg="red")
+            self.light_indicator.config(fg="red")
         elif self.selected_option == 2:
-            self.light_indicator.config(text="⚪", fg="yellow")
+            self.light_indicator.config(fg="yellow")
         elif self.selected_option == 3:
-            self.light_indicator.config(text="⚪", fg="green")
+            self.light_indicator.config(fg="green")
         elif self.selected_option == 4:
-            self.light_indicator.config(text="⚪", fg="blue")
+            self.light_indicator.config(fg="blue")
         elif self.selected_option == 5:
-            self.light_indicator.config(text="⚪", fg="purple")
+            self.light_indicator.config(fg="purple")
 
         # Publish selected option to ROS
         self.choice_publisher.publish(self.selected_option)
+
+    def ros_spin(self):
+        # Allow ROS to process incoming messages
+        rospy.rostime.wallsleep(0.1)
+        # Call this method again after 100 ms
+        self.root.after(100, self.ros_spin)
 
 if __name__ == "__main__":
     root = tk.Tk()
