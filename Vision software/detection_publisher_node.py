@@ -1,43 +1,48 @@
-#!/usr/bin/env python
-
 import rospy
-from depthai_ros_msgs.msg import SpatialDetectionArray
-from geometry_msgs.msg import PoseStamped
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+import cv2
+import numpy as np
 
-# Define the offsets to be added to the coordinates
-OFFSET_X = 1.0  # Replace with your desired offset for x
-OFFSET_Y = 1.0  # Replace with your desired offset for y
-OFFSET_Z = 1.0  # Replace with your desired offset for z
+# Initialize the node
+rospy.init_node('angle_detection_node', anonymous=True)
 
-def detection_callback(msg):
-    rospy.loginfo("Received detection message with %d detections", len(msg.detections))
-    for detection in msg.detections:
-        pose_msg = PoseStamped()
-        pose_msg.header = msg.header
+# Create a CvBridge object
+bridge = CvBridge()
 
-        # Add offsets to the coordinates
-        pose_msg.pose.position.x = detection.position.x + OFFSET_X
-        pose_msg.pose.position.y = detection.position.y + OFFSET_Y
-        pose_msg.pose.position.z = detection.position.z + OFFSET_Z
+def image_callback(msg):
+    # Convert the ROS Image message to a OpenCV image
+    cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+    
+    # Process the image and calculate the angle
+    angle = detect_angle(cv_image)
+    
+    # Log the angle
+    rospy.loginfo("Detected angle: {:.2f} degrees".format(angle))
 
-        # Assuming the detection object has an orientation field
-        pose_msg.pose.orientation = detection.orientation
+def detect_angle(image):
+    # Convert the image to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Use edge detection (Canny, for example)
+    edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+    
+    # Detect lines in the image using Hough Transform
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 100)
+    
+    if lines is not None:
+        # Get the first line (rho, theta)
+        rho, theta = lines[0][0]
+        
+        # Calculate the angle in degrees
+        angle = theta * 180 / np.pi
+        
+        return angle
+    else:
+        return 0  # No lines found
 
-        # Printing the details for debug purposes
-        rospy.loginfo("Detection ID: %d", detection.label)
-        rospy.loginfo("Original Position: x=%.2f, y=%.2f, z=%.2f", 
-                      detection.position.x, detection.position.y, detection.position.z)
-        rospy.loginfo("Updated Position: x=%.2f, y=%.2f, z=%.2f", 
-                      pose_msg.pose.position.x, pose_msg.pose.position.y, pose_msg.pose.position.z)
-        rospy.loginfo("Orientation: x=%.2f, y=%.2f, z=%.2f, w=%.2f",
-                      pose_msg.pose.orientation.x, pose_msg.pose.orientation.y, 
-                      pose_msg.pose.orientation.z, pose_msg.pose.orientation.w)
+# Subscribe to the image topic
+image_sub = rospy.Subscriber('/stereo_inertial_nn_publisher/color/image', Image, image_callback)
 
-        pub.publish(pose_msg)
-
-if __name__ == '__main__':
-    rospy.init_node('detection_processor_node')
-    pub = rospy.Publisher('detection_pose', PoseStamped, queue_size=10)
-    rospy.Subscriber('color/detections', SpatialDetectionArray, detection_callback)
-    rospy.loginfo("Detection processor node initialized.")
-    rospy.spin()
+# Keep the node running
+rospy.spin()
