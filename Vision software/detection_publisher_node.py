@@ -10,6 +10,7 @@ OFFSET_Y = 1.0  # Replace with your desired offset for y
 OFFSET_Z = 1.0  # Replace with your desired offset for z
 
 def detection_callback(msg):
+    rospy.loginfo("Received detection message with %d detections", len(msg.detections))
     for detection in msg.detections:
         pose_msg = PoseStamped()
         pose_msg.header = msg.header
@@ -38,4 +39,5 @@ if __name__ == '__main__':
     rospy.init_node('detection_processor_node')
     pub = rospy.Publisher('detection_pose', PoseStamped, queue_size=10)
     rospy.Subscriber('color/detections', SpatialDetectionArray, detection_callback)
+    rospy.loginfo("Detection processor node initialized.")
     rospy.spin()
