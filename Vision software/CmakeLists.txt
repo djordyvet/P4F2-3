@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(detection_publisher)
+
+find_package(catkin REQUIRED COMPONENTS
+  rospy
+  std_msgs
+  geometry_msgs
+  depthai_ros_msgs
+)
+
+catkin_package(
+  CATKIN_DEPENDS rospy std_msgs geometry_msgs depthai_ros_msgs
+)
+
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
+
