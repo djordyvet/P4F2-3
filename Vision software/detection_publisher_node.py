@@ -24,7 +24,9 @@ def detection_callback(msg):
 
         # Printing the details for debug purposes
         rospy.loginfo("Detection ID: %d", detection.label)
-        rospy.loginfo("Position: x=%.2f, y=%.2f, z=%.2f", 
+        rospy.loginfo("Original Position: x=%.2f, y=%.2f, z=%.2f", 
+                      detection.position.x, detection.position.y, detection.position.z)
+        rospy.loginfo("Updated Position: x=%.2f, y=%.2f, z=%.2f", 
                       pose_msg.pose.position.x, pose_msg.pose.position.y, pose_msg.pose.position.z)
         rospy.loginfo("Orientation: x=%.2f, y=%.2f, z=%.2f, w=%.2f",
                       pose_msg.pose.orientation.x, pose_msg.pose.orientation.y, 
