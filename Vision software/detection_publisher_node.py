@@ -39,6 +39,12 @@ class ObjectAngleDetector:
             x_max = int(bbox.center.x + bbox.size_x / 2)
             y_max = int(bbox.center.y + bbox.size_y / 2)
 
+            # Ensure the bounding box is within the image dimensions
+            x_min = max(0, x_min)
+            y_min = max(0, y_min)
+            x_max = min(self.latest_image.shape[1], x_max)
+            y_max = min(self.latest_image.shape[0], y_max)
+
             # Crop the region from the image
             cropped_image = self.latest_image[y_min:y_max, x_min:x_max]
 
@@ -46,10 +52,10 @@ class ObjectAngleDetector:
             angle, annotated_image = self.calculate_angle(cropped_image)
 
             # Log the angle
-            rospy.loginfo(f"Detected angle: {angle:.2f} degrees")
+            rospy.loginfo("Detected angle: {:.2f} degrees".format(angle))
 
             # Display the annotated cropped image
-            cv2.imshow(f'Annotated Cropped Image - {detection.results[0].id}', annotated_image)
+            cv2.imshow('Annotated Cropped Image', annotated_image)
             cv2.waitKey(1)
 
     def calculate_angle(self, image):
@@ -84,7 +90,7 @@ class ObjectAngleDetector:
             cv2.line(annotated_image, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
             # Annotate the image with the angle
-            cv2.putText(annotated_image, f"Angle: {angle:.2f} degrees", (10, 30),
+            cv2.putText(annotated_image, "Angle: {:.2f} degrees".format(angle), (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
             return angle, annotated_image
