@@ -1,7 +1,7 @@
 <package format="2">
-  <name>detection_publisher</name>
+  <name>detection_processor</name>
   <version>0.0.1</version>
-  <description>The detection_publisher package</description>
+  <description>The detection_processor package</description>
 
   <maintainer email="user@example.com">Your Name</maintainer>
 
