@@ -51,12 +51,26 @@ class ObjectAngleDetector:
             # Calculate the angle of the object in the cropped region
             angle, annotated_image = self.calculate_angle(cropped_image)
 
-            # Log the angle
+            # Find the centroid of the bounding box
+            centroid_x, centroid_y = self.find_centroid(x_min, y_min, x_max, y_max)
+
+            # Log the angle and centroid
             rospy.loginfo("Detected angle: {:.2f} degrees".format(angle))
+            rospy.loginfo("Bounding box centroid: ({}, {})".format(centroid_x, centroid_y))
+
+            # Annotate the image with the centroid
+            cv2.circle(self.latest_image, (centroid_x, centroid_y), 5, (255, 0, 0), -1)
 
             # Display the annotated cropped image
             cv2.imshow('Annotated Cropped Image', annotated_image)
+            cv2.imshow('Annotated Image with Centroid', self.latest_image)
             cv2.waitKey(1)
+
+    def find_centroid(self, x_min, y_min, x_max, y_max):
+        # Calculate the centroid of the bounding box
+        centroid_x = (x_min + x_max) // 2
+        centroid_y = (y_min + y_max) // 2
+        return centroid_x, centroid_y
 
     def calculate_angle(self, image):
         # Convert the image to grayscale
