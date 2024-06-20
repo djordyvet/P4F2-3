@@ -4,6 +4,7 @@ from depthai_ros_msgs.msg import SpatialDetectionArray
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
+from your_package_name.msg import BoundingBoxAngle  # Replace with your package name
 
 class ObjectAngleDetector:
     def __init__(self):
@@ -12,6 +13,9 @@ class ObjectAngleDetector:
 
         # Create a CvBridge object
         self.bridge = CvBridge()
+
+        # Publisher for the angle and centroid
+        self.angle_pub = rospy.Publisher('/object_angle_detector/angle_centroid', BoundingBoxAngle, queue_size=10)
 
         # Subscribe to the image and bounding box topics
         rospy.Subscriber('/stereo_inertial_nn_publisher/color/image', Image, self.image_callback)
@@ -66,6 +70,9 @@ class ObjectAngleDetector:
             cv2.imshow('Annotated Image with Centroid', self.latest_image)
             cv2.waitKey(1)
 
+            # Publish the angle and centroid
+            self.publish_angle_centroid(angle, centroid_x, centroid_y)
+
     def find_centroid(self, x_min, y_min, x_max, y_max):
         # Calculate the centroid of the bounding box
         centroid_x = (x_min + x_max) // 2
@@ -113,6 +120,14 @@ class ObjectAngleDetector:
             cv2.putText(annotated_image, "No lines detected", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
             return 0, annotated_image
+
+    def publish_angle_centroid(self, angle, centroid_x, centroid_y):
+        # Create and publish the BoundingBoxAngle message
+        msg = BoundingBoxAngle()
+        msg.angle = angle
+        msg.centroid_x = centroid_x
+        msg.centroid_y = centroid_y
+        self.angle_pub.publish(msg)
 
     def run(self):
         # Keep the node running
