@@ -1,17 +1,23 @@
-cmake_minimum_required(VERSION 3.0.2)
-project(detection_processor)
-
+# Find the message generation package
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
-  geometry_msgs
-  depthai_ros_msgs
+  message_generation
 )
 
+# Add the message files
+add_message_files(
+  FILES
+  BoundingBoxAngle.msg
+)
+
+# Generate the message
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+# Declare a catkin package
 catkin_package(
-  CATKIN_DEPENDS rospy std_msgs geometry_msgs depthai_ros_msgs
-)
-
-include_directories(
-  ${catkin_INCLUDE_DIRS}
+  CATKIN_DEPENDS message_runtime std_msgs
 )
