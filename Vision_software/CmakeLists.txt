@@ -1,0 +1,23 @@
+# Find the message generation package
+find_package(catkin REQUIRED COMPONENTS
+  rospy
+  std_msgs
+  message_generation
+)
+
+# Add the message files
+add_message_files(
+  FILES
+  BoundingBoxAngle.msg
+)
+
+# Generate the message
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+# Declare a catkin package
+catkin_package(
+  CATKIN_DEPENDS message_runtime std_msgs
+)
