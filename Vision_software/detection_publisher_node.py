@@ -4,7 +4,7 @@ from depthai_ros_msgs.msg import SpatialDetectionArray
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
-from BoundingBoxAngle.msg import BoundingBoxAngle  
+from Vision_software.msg import BoundingBoxAngle  
 
 class ObjectAngleDetector:
     def __init__(self):
