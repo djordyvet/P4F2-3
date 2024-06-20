@@ -1,23 +1,26 @@
-# Find the message generation package
+cmake_minimum_required(VERSION 2.8.3)
+project(Vision_software)
+
+## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
 )
 
-# Add the message files
+## Add message files
 add_message_files(
   FILES
   BoundingBoxAngle.msg
 )
 
-# Generate the message
+## Generate added messages and services
 generate_messages(
   DEPENDENCIES
   std_msgs
 )
 
-# Declare a catkin package
+## Declare a catkin package
 catkin_package(
   CATKIN_DEPENDS message_runtime std_msgs
 )
