@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import rospy
 from sensor_msgs.msg import Image
 from depthai_ros_msgs.msg import SpatialDetectionArray
@@ -6,7 +8,7 @@ import cv2
 import numpy as np
 
 class ObjectAngleDetector:
-    def _init_(self):
+    def __init__(self):
         # Initialize the ROS node
         rospy.init_node('object_angle_detector', anonymous=True)
 
@@ -110,6 +112,6 @@ class ObjectAngleDetector:
         # Close OpenCV windows on shutdown
         cv2.destroyAllWindows()
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     detector = ObjectAngleDetector()
     detector.run()
