@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import Tkinter as tk
-from PIL import Image, ImageTk
 import rospy
 from std_msgs.msg import Int32, Bool
 from geometry_msgs.msg import Point  # Assuming the coordinates are published as geometry_msgs/Point
