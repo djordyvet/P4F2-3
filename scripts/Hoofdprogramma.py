@@ -4,7 +4,6 @@ Datum:              21-6-2024
 Prgmma:             Hoofdprogramma.py
 "
 #!/usr/bin/env python
-
 import rospy
 from std_msgs.msg import Bool
 
@@ -32,17 +31,15 @@ def HMI_Subscribers():
 ///
 Start signaal verwerken
 def signal_callback(msg):
+    rospy.init_node('hoofdprogramma/hmi_signal', Bool, queue_size=10))
     if HMI_Subscribers.data == TRUE:
-        /// send signal to start camera
-          
-      print("Received start signal from HMI.")
-        # Add your start process logic here
-        # For example, start a process or initiate some action
+        print("Received start signal from HMI.")
+        start_Camera launchfile
+        start_manupulator launchfile
     else:
         print("Received stop signal from HMI.")
-        # Add your stop process logic here
-        # For example, stop a process or perform shutdown actions
-
+        
+        
 
 #ontvangen en verwerken start signaal
 
@@ -51,6 +48,8 @@ def signal_callback(msg):
 
 #vision aansturing en verwerking
 vision: 
+
++starten camera
 
 // if object = found send info to manipulation
 
@@ -63,7 +62,7 @@ int class index
 #manipulatie aansturing en verwerking 
 manupilator
 x,y,z yawn 
-startsignaal
++startsignaal
 
 
 
