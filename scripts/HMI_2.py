@@ -36,7 +36,7 @@ class HMIApp:
         self.slider_name_box = tk.Entry(self.middle_frame, font=("Helvetica", 14))
         self.slider_name_box.pack(pady=10)
 
-        # Right Frame for Coordinates
+        # Right Frame for Coordinates and Info Box
         self.right_frame = tk.Frame(self.main_frame)
         self.right_frame.grid(row=0, column=2, padx=10)
 
@@ -57,6 +57,10 @@ class HMIApp:
         self.z_coord_label.grid(row=2, column=0, padx=5)
         self.z_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
         self.z_coord_text.grid(row=2, column=1, padx=5)
+
+        # Info Box
+        self.info_box = tk.Text(self.right_frame, height=10, width=40, font=("Helvetica", 12))
+        self.info_box.pack(pady=10)
 
         # Light Indicators
         self.light_frame = tk.Frame(root)
@@ -101,6 +105,8 @@ class HMIApp:
             self.light1.config(text="O", fg="green")
             self.light2.config(text="O", fg="grey")
             self.light3.config(text="O", fg="grey")
+            # Update info box
+            self.update_info_box("Process started.")
 
     def stop_process(self):
         if self.process_running:
@@ -116,6 +122,8 @@ class HMIApp:
             self.light1.config(text="O", fg="grey")
             self.light2.config(text="O", fg="grey")
             self.light3.config(text="O", fg="red")
+            # Update info box
+            self.update_info_box("Process stopped.")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
@@ -134,14 +142,11 @@ class HMIApp:
         self.z_coord_text.delete(0, tk.END)
         self.z_coord_text.insert(0, str(msg.z))
 
-    def update_coordinates(self, x, y, z):
-        # Update the text boxes with new coordinates
-        self.x_coord_text.delete(0, tk.END)
-        self.x_coord_text.insert(0, str(x))
-        self.y_coord_text.delete(0, tk.END)
-        self.y_coord_text.insert(0, str(y))
-        self.z_coord_text.delete(0, tk.END)
-        self.z_coord_text.insert(0, str(z))
+    def update_info_box(self, message):
+        # Append a message to the info box
+        self.info_box.insert(tk.END, message + "\n")
+        # Automatically scroll to the bottom
+        self.info_box.see(tk.END)
 
     def ros_spin(self):
         # Allow ROS to process incoming messages
