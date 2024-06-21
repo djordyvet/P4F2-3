@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 import rospy
 from sensor_msgs.msg import Image
 from depthai_ros_msgs.msg import SpatialDetectionArray
+from your_package_name.msg import BoundingBoxAngle  # Replace 'your_package_name' with the actual package name
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
@@ -16,6 +19,9 @@ class ObjectAngleDetector:
         # Subscribe to the image and bounding box topics
         rospy.Subscriber('/stereo_inertial_nn_publisher/color/image', Image, self.image_callback)
         rospy.Subscriber('/stereo_inertial_nn_publisher/color/detections', SpatialDetectionArray, self.detection_callback)
+
+        # Publisher for the BoundingBoxAngle message
+        self.angle_pub = rospy.Publisher('/object_angle', BoundingBoxAngle, queue_size=10)
 
         self.latest_image = None
         self.detections = []
@@ -51,8 +57,19 @@ class ObjectAngleDetector:
             # Calculate the angle of the object in the cropped region
             angle, annotated_image = self.calculate_angle(cropped_image)
 
-            # Log the angle
-            rospy.loginfo("Detected angle: {:.2f} degrees".format(angle))
+            # Calculate the center of the bounding box
+            centroid_x = (x_min + x_max) // 2
+            centroid_y = (y_min + y_max) // 2
+
+            # Log the angle and coordinates
+            rospy.loginfo("Detected angle: {:.2f} degrees, Centroid: ({}, {})".format(angle, centroid_x, centroid_y))
+
+            # Publish the BoundingBoxAngle message
+            bbox_angle_msg = BoundingBoxAngle()
+            bbox_angle_msg.angle = angle
+            bbox_angle_msg.centroid_x = centroid_x
+            bbox_angle_msg.centroid_y = centroid_y
+            self.angle_pub.publish(bbox_angle_msg)
 
             # Display the annotated cropped image
             cv2.imshow('Annotated Cropped Image', annotated_image)
