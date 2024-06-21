@@ -103,8 +103,8 @@ class HMIApp:
             self.status_indicator.config(text="Running", fg="green")
             # Update lights
             self.light1.config(fg="green")
-            self.light2.config(fg="green")
-            self.light3.config(fg="green")
+            self.light2.config(fg="gray")
+            self.light3.config(fg="gray")
 
     def stop_process(self):
         if self.process_running:
