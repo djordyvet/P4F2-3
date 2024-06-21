@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import Tkinter as tk
+from PIL import Image, ImageTk
 import rospy
 from std_msgs.msg import Int32, Bool
 from geometry_msgs.msg import Point  # Assuming the coordinates are published as geometry_msgs/Point
@@ -23,6 +24,41 @@ class HMIApp:
         self.stop_button = tk.Button(self.left_frame, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
 
+        # Middle Frame for Slider
+        self.middle_frame = tk.Frame(self.main_frame)
+        self.middle_frame.grid(row=0, column=1, padx=10)
+
+        self.slider_label = tk.Label(self.middle_frame, text="Select Option", font=("Helvetica", 14))
+        self.slider_label.pack(pady=10)
+
+        self.slider = tk.Scale(self.middle_frame, from_=1, to=5, orient="horizontal", command=self.update_slider_label)
+        self.slider.pack(pady=10)
+
+        self.slider_name_box = tk.Entry(self.middle_frame, font=("Helvetica", 14))
+        self.slider_name_box.pack(pady=10)
+
+        # Right Frame for Coordinates
+        self.right_frame = tk.Frame(self.main_frame)
+        self.right_frame.grid(row=0, column=2, padx=10)
+
+        self.coord_frame = tk.Frame(self.right_frame)
+        self.coord_frame.pack(pady=10)
+        
+        self.x_coord_label = tk.Label(self.coord_frame, text="X Coordinate:", font=("Helvetica", 12))
+        self.x_coord_label.grid(row=0, column=0, padx=5)
+        self.x_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
+        self.x_coord_text.grid(row=0, column=1, padx=5)
+        
+        self.y_coord_label = tk.Label(self.coord_frame, text="Y Coordinate:", font=("Helvetica", 12))
+        self.y_coord_label.grid(row=1, column=0, padx=5)
+        self.y_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
+        self.y_coord_text.grid(row=1, column=1, padx=5)
+        
+        self.z_coord_label = tk.Label(self.coord_frame, text="Z Coordinate:", font=("Helvetica", 12))
+        self.z_coord_label.grid(row=2, column=0, padx=5)
+        self.z_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
+        self.z_coord_text.grid(row=2, column=1, padx=5)
+
         # Light Indicators
         self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
         self.status_indicator.pack(pady=10)
@@ -40,15 +76,15 @@ class HMIApp:
         # Process Variables
         self.process_running = False
 
-        # Set initial light colors
-        self.update_light_colors("idle")
-
         # ROS Initialization
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
         rospy.Subscriber('coordinates', Point, self.coordinates_callback)  # Assuming the topic 'coordinates' publishes geometry_msgs/Point
 
+        # Initialize the name box with the first option
+        self.update_slider_label("1")
+        
         # Run Tkinter main loop in a way that doesn't block ROS callbacks
         self.root.after(100, self.ros_spin)
 
@@ -58,12 +94,18 @@ class HMIApp:
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
             self.signal_publisher.publish(True)  # Publish start signal
+            # Publish start message as a ROS message
+            start_msg = Bool()
+            start_msg.data = True
+            self.signal_publisher.publish(start_msg)
             # Publish selected option to ROS
             self.choice_publisher.publish(self.selected_option)
             # Update status indicator to Running
             self.status_indicator.config(text="Running", fg="green")
             # Update lights
-            self.update_light_colors("running")
+            self.light1.config(fg="green")
+            self.light2.config(fg="green")
+            self.light3.config(fg="green")
 
     def stop_process(self):
         if self.process_running:
@@ -71,36 +113,39 @@ class HMIApp:
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
             self.signal_publisher.publish(False)  # Publish stop signal
+            # Publish stop message as a ROS message
+            stop_msg = Bool()
+            stop_msg.data = False
+            self.signal_publisher.publish(stop_msg)
             # Update status indicator to Stopped
             self.status_indicator.config(text="Stopped", fg="red")
             # Update lights
-            self.update_light_colors("stopped")
+            self.light1.config(fg="red")
+            self.light2.config(fg="red")
+            self.light3.config(fg="red")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
+        # Update slider name box based on selected option
+        names = {1: "Option 1", 2: "Option 2", 3: "Option 3", 4: "Option 4", 5: "Option 5"}
+        name = names.get(self.selected_option, "Unknown")
+        self.slider_name_box.delete(0, tk.END)
+        self.slider_name_box.insert(0, name)
 
     def coordinates_callback(self, msg):
-        pass
+        # Update the text boxes with the coordinates
+        self.x_coord_text.delete(0, tk.END)
+        self.x_coord_text.insert(0, str(msg.x))
+        self.y_coord_text.delete(0, tk.END)
+        self.y_coord_text.insert(0, str(msg.y))
+        self.z_coord_text.delete(0, tk.END)
+        self.z_coord_text.insert(0, str(msg.z))
 
     def ros_spin(self):
         # Allow ROS to process incoming messages
         rospy.rostime.wallsleep(0.1)
         # Call this method again after 100 ms
         self.root.after(100, self.ros_spin)
-
-    def update_light_colors(self, status):
-        if status == "idle":
-            self.light1.config(fg="grey")
-            self.light2.config(fg="grey")
-            self.light3.config(fg="orange")
-        elif status == "running":
-            self.light1.config(fg="green")
-            self.light2.config(fg="grey")
-            self.light3.config(fg="grey")
-        elif status == "stopped":
-            self.light1.config(fg="grey")
-            self.light2.config(fg="red")
-            self.light3.config(fg="grey")
 
 if __name__ == "__main__":
     root = tk.Tk()
