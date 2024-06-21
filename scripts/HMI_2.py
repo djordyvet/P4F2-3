@@ -7,12 +7,7 @@ from geometry_msgs.msg import Point  # Assuming the coordinates are published as
 class HMIApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("HMI with Counter, Buttons, Slider, and Coordinates")
-
-        # Counter
-        self.counter_value = 0
-        self.counter_label = tk.Label(root, text="Counter: " + str(self.counter_value), font=("Helvetica", 16))
-        self.counter_label.pack(pady=10)
+        self.root.title("HMI with Buttons, Slider, and Coordinates")
 
         # Buttons
         self.start_button = tk.Button(root, text="Start", command=self.start_process, font=("Helvetica", 12))
@@ -20,9 +15,6 @@ class HMIApp:
 
         self.stop_button = tk.Button(root, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
-
-        self.reset_button = tk.Button(root, text="Reset", command=self.reset_process, font=("Helvetica", 12))
-        self.reset_button.pack(pady=5)
 
         # Slider
         self.slider_label = tk.Label(root, text="Select Option", font=("Helvetica", 14))
@@ -91,7 +83,6 @@ class HMIApp:
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
             self.signal_publisher.publish(True)  # Publish start signal
-            self.process_id = self.root.after(1000, self.update_counter)
             # Publish start message as a ROS message
             start_msg = Bool()
             start_msg.data = True
@@ -109,8 +100,6 @@ class HMIApp:
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
             self.signal_publisher.publish(False)  # Publish stop signal
-            if self.process_id:
-                self.root.after_cancel(self.process_id)
             # Publish stop message as a ROS message
             stop_msg = Bool()
             stop_msg.data = False
@@ -121,22 +110,6 @@ class HMIApp:
             self.light1.config(fg="red")
             self.light2.config(fg="red")
             self.light3.config(fg="red")
-
-    def reset_process(self):
-        self.counter_value = 0
-        self.counter_label.config(text="Counter: " + str(self.counter_value))
-        # Update status indicator to Idle
-        self.status_indicator.config(text="Idle", fg="grey")
-        # Update lights
-        self.light1.config(fg="grey")
-        self.light2.config(fg="grey")
-        self.light3.config(fg="grey")
-
-    def update_counter(self):
-        if self.process_running:
-            self.counter_value += 1
-            self.counter_label.config(text="Counter: " + str(self.counter_value))
-            self.process_id = self.root.after(1000, self.update_counter)
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
