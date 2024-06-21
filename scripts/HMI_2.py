@@ -1,3 +1,9 @@
+"
+Gemaakt door:       Pieter Roozendaal
+Datum:              21-6-2024
+Prgmma:             HMI.py
+"
+
 import tkinter as tk
 import rospy
 from std_msgs.msg import Int32, Bool
