@@ -23,14 +23,10 @@ class HMIApp:
         self.slider = tk.Scale(root, from_=1, to=5, orient="horizontal", command=self.update_slider_label)
         self.slider.pack(pady=10)
 
-        self.selected_option = 1
-        self.selected_option_label = tk.Label(root, text="Selected Option: 1", font=("Helvetica", 14))
-        self.selected_option_label.pack(pady=10)
-
         # Light Indicators
         self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
         self.status_indicator.pack(pady=10)
-        
+
         self.slider_name_box = tk.Entry(root, font=("Helvetica", 14))
         self.slider_name_box.pack(pady=10)
 
@@ -63,7 +59,6 @@ class HMIApp:
 
         # Process Variables
         self.process_running = False
-        self.process_id = None
 
         # ROS Initialization
         rospy.init_node('hmi_publisher', anonymous=True)
@@ -115,8 +110,6 @@ class HMIApp:
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
-        self.selected_option_label.config(text="Selected Option: " + str(value))
-
         # Update slider name box based on selected option
         names = {1: "Alles Sorteren", 2: "Obj:Schroevendraaier", 3: "Obj:KleineSchroevendraaier", 4: "Obj:Dop_10", 5: "Obj:SpanningsTester"}
         name = names.get(self.selected_option, "Unknown")
@@ -142,4 +135,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = HMIApp(root)
     root.mainloop()
-
