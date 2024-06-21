@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+
 import rospy
 from sensor_msgs.msg import Image
 from depthai_ros_msgs.msg import SpatialDetectionArray
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
+from Vision_software.msg import BoundingBoxAngle  # Adjust package name if different
 
 class ObjectAngleDetector:
     def __init__(self):
@@ -19,6 +22,9 @@ class ObjectAngleDetector:
 
         self.latest_image = None
         self.detections = []
+
+        # Publisher for custom message
+        self.angle_pub = rospy.Publisher('bounding_box_angle', BoundingBoxAngle, queue_size=10)
 
     def image_callback(self, msg):
         # Convert the ROS Image message to an OpenCV image
@@ -50,6 +56,13 @@ class ObjectAngleDetector:
 
             # Calculate the angle of the object in the cropped region
             angle, annotated_image = self.calculate_angle(cropped_image)
+
+            # Publish the angle and centroid coordinates
+            bbox_angle = BoundingBoxAngle()
+            bbox_angle.angle = angle
+            bbox_angle.centroid_x = int((x_min + x_max) / 2)
+            bbox_angle.centroid_y = int((y_min + y_max) / 2)
+            self.angle_pub.publish(bbox_angle)
 
             # Log the angle
             rospy.loginfo("Detected angle: {:.2f} degrees".format(angle))
