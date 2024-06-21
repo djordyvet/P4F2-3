@@ -127,7 +127,7 @@ class HMIApp:
     def update_slider_label(self, value):
         self.selected_option = int(value)
         # Update slider name box based on selected option
-        names = {1: "Option 1", 2: "Option 2", 3: "Option 3", 4: "Option 4", 5: "Option 5"}
+        names = {1: "Dop_10", 2: "KleineSchroevendraaier", 3: "Schroevendraaier:", 4: "Spanningstester:", 5: "Alles Sorteren"}
         name = names.get(self.selected_option, "Unknown")
         self.slider_name_box.delete(0, tk.END)
         self.slider_name_box.insert(0, name)
