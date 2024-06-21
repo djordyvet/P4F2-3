@@ -98,9 +98,9 @@ class HMIApp:
             # Publish selected option to ROS
             self.choice_publisher.publish(self.selected_option)
             # Update lights
-            self.light1.config(text="Running", fg="green")
-            self.light2.config(text="Inactive", fg="grey")
-            self.light3.config(text="Inactive", fg="grey")
+            self.light1.config(text="O", fg="green")
+            self.light2.config(text="O", fg="grey")
+            self.light3.config(text="O", fg="grey")
 
     def stop_process(self):
         if self.process_running:
@@ -113,9 +113,9 @@ class HMIApp:
             stop_msg.data = False
             self.signal_publisher.publish(stop_msg)
             # Update lights
-            self.light1.config(text="Stopped", fg="grey")
-            self.light2.config(text="Inactive", fg="grey")
-            self.light3.config(text="Inactive", fg="red")
+            self.light1.config(text="O", fg="grey")
+            self.light2.config(text="O", fg="grey")
+            self.light3.config(text="O", fg="red")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
