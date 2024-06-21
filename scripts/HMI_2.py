@@ -7,7 +7,7 @@ from std_msgs.msg import Float32MultiArray
 class HMIApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("HMI with Slider, Buttons, Coordinates, and Camera View")
+        self.root.title("Human Machine Interface")
 
         # Create a frame for the entire layout
         self.main_frame = tk.Frame(root)
