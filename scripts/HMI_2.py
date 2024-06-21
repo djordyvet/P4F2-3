@@ -7,14 +7,7 @@ from geometry_msgs.msg import Point  # Assuming the coordinates are published as
 class HMIApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("HMI with Buttons, Slider, and Coordinates")
-
-        # Buttons
-        self.start_button = tk.Button(root, text="Start", command=self.start_process, font=("Helvetica", 12))
-        self.start_button.pack(pady=5)
-
-        self.stop_button = tk.Button(root, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
-        self.stop_button.pack(pady=5)
+        self.root.title("HMI with Slider, Buttons, and Coordinates")
 
         # Slider
         self.slider_label = tk.Label(root, text="Select Option", font=("Helvetica", 14))
@@ -23,12 +16,19 @@ class HMIApp:
         self.slider = tk.Scale(root, from_=1, to=5, orient="horizontal", command=self.update_slider_label)
         self.slider.pack(pady=10)
 
+        self.slider_name_box = tk.Entry(root, font=("Helvetica", 14))
+        self.slider_name_box.pack(pady=10)
+
+        # Buttons
+        self.start_button = tk.Button(root, text="Start", command=self.start_process, font=("Helvetica", 12))
+        self.start_button.pack(pady=5)
+
+        self.stop_button = tk.Button(root, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
+        self.stop_button.pack(pady=5)
+
         # Light Indicators
         self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
         self.status_indicator.pack(pady=10)
-
-        self.slider_name_box = tk.Entry(root, font=("Helvetica", 14))
-        self.slider_name_box.pack(pady=10)
 
         # Coordinates Text Boxes
         self.coord_frame = tk.Frame(root)
@@ -135,3 +135,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = HMIApp(root)
     root.mainloop()
+
+
