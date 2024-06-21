@@ -65,11 +65,12 @@ class HMIApp:
         self.light_frame = tk.Frame(root)
         self.light_frame.pack(pady=10)
         
-        self.light1 = tk.Label(self.light_frame, text="Light 1", font=("Helvetica", 16), fg="grey")
+        # Set initial light colors
+        self.light1 = tk.Label(self.light_frame, text="Light 1", font=("Helvetica", 16), fg="orange")
         self.light1.grid(row=0, column=0, padx=5)
-        self.light2 = tk.Label(self.light_frame, text="Light 2", font=("Helvetica", 16), fg="grey")
+        self.light2 = tk.Label(self.light_frame, text="Light 2", font=("Helvetica", 16), fg="orange")
         self.light2.grid(row=0, column=1, padx=5)
-        self.light3 = tk.Label(self.light_frame, text="Light 3", font=("Helvetica", 16), fg="grey")
+        self.light3 = tk.Label(self.light_frame, text="Light 3", font=("Helvetica", 16), fg="orange")
         self.light3.grid(row=0, column=2, padx=5)
 
         # Process Variables
@@ -103,8 +104,8 @@ class HMIApp:
             self.status_indicator.config(text="Running", fg="green")
             # Update lights
             self.light1.config(fg="green")
-            self.light2.config(fg="gray")
-            self.light3.config(fg="gray")
+            self.light2.config(fg="grey")
+            self.light3.config(fg="grey")
 
     def stop_process(self):
         if self.process_running:
@@ -119,9 +120,9 @@ class HMIApp:
             # Update status indicator to Stopped
             self.status_indicator.config(text="Stopped", fg="red")
             # Update lights
-            self.light1.config(fg="gray")
+            self.light1.config(fg="grey")
             self.light2.config(fg="red")
-            self.light3.config(fg="gray")
+            self.light3.config(fg="grey")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
