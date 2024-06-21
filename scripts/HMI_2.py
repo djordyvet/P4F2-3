@@ -66,11 +66,11 @@ class HMIApp:
         self.light_frame.pack(pady=10)
         
         # Set initial light colors
-        self.light1 = tk.Label(self.light_frame, text="Light 1", font=("Helvetica", 16), fg="Gray")
+        self.light1 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="Gray")
         self.light1.grid(row=0, column=0, padx=5)
-        self.light2 = tk.Label(self.light_frame, text="Light 2", font=("Helvetica", 16), fg="Gray")
+        self.light2 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="Gray")
         self.light2.grid(row=0, column=1, padx=5)
-        self.light3 = tk.Label(self.light_frame, text="Light 3", font=("Helvetica", 16), fg="orange")
+        self.light3 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="orange")
         self.light3.grid(row=0, column=2, padx=5)
 
         # Process Variables
