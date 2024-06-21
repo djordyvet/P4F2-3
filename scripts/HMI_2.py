@@ -119,9 +119,9 @@ class HMIApp:
             # Update status indicator to Stopped
             self.status_indicator.config(text="Stopped", fg="red")
             # Update lights
-            self.light1.config(fg="red")
+            self.light1.config(fg="gray")
             self.light2.config(fg="red")
-            self.light3.config(fg="red")
+            self.light3.config(fg="gray")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
