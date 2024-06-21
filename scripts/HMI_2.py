@@ -59,7 +59,7 @@ class HMIApp:
         self.z_coord_text.grid(row=2, column=1, padx=5)
 
         # Info Box
-        self.info_box = tk.Text(self.right_frame, height=10, width=40, font=("Helvetica", 12))
+        self.info_box = tk.Text(self.right_frame, height=5, width=30, font=("Helvetica", 12))
         self.info_box.pack(pady=10)
 
         # Light Indicators
