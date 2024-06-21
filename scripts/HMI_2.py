@@ -1,9 +1,3 @@
-"
-Gemaakt door:       Pieter Roozendaal
-Datum:              21-6-2024
-Prgmma:             HMI.py
-"
-
 import tkinter as tk
 import rospy
 from std_msgs.msg import Int32, Bool
@@ -28,6 +22,9 @@ class HMIApp:
 
         self.stop_button = tk.Button(self.left_frame, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
+
+        self.emergency_button = tk.Button(self.left_frame, text="Emergency Stop", command=self.emergency_stop, font=("Helvetica", 12), fg="red")
+        self.emergency_button.pack(pady=5)
 
         # Middle Frame for Slider
         self.middle_frame = tk.Frame(self.main_frame)
@@ -100,6 +97,7 @@ class HMIApp:
             self.process_running = True
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
+            self.emergency_button.config(state="normal")
             self.signal_publisher.publish(True)  # Publish start signal
             # Publish start message as a ROS message
             start_msg = Bool()
@@ -119,6 +117,7 @@ class HMIApp:
             self.process_running = False
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
+            self.emergency_button.config(state="disabled")
             self.signal_publisher.publish(False)  # Publish stop signal
             # Publish stop message as a ROS message
             stop_msg = Bool()
@@ -130,6 +129,25 @@ class HMIApp:
             self.light3.config(text="O", fg="red")
             # Update info box
             self.update_info_box("Process stopped.")
+
+    def emergency_stop(self):
+        # Handle emergency stop action
+        if self.process_running:
+            self.process_running = False
+            self.start_button.config(state="normal")
+            self.stop_button.config(state="disabled")
+            self.emergency_button.config(state="disabled")
+            self.signal_publisher.publish(False)  # Publish stop signal
+            # Publish stop message as a ROS message
+            stop_msg = Bool()
+            stop_msg.data = False
+            self.signal_publisher.publish(stop_msg)
+            # Update lights
+            self.light1.config(text="O", fg="grey")
+            self.light2.config(text="O", fg="grey")
+            self.light3.config(text="O", fg="red")
+            # Update info box
+            self.update_info_box("Emergency stop activated.")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
