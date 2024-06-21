@@ -62,11 +62,11 @@ class HMIApp:
         self.light_frame = tk.Frame(root)
         self.light_frame.pack(pady=10)
         
-        self.light1 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="orange")
+        self.light1 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="grey")
         self.light1.grid(row=0, column=0, padx=5)
         self.light2 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="orange")
         self.light2.grid(row=0, column=1, padx=5)
-        self.light3 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="orange")
+        self.light3 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="grey")
         self.light3.grid(row=0, column=2, padx=5)
 
         # Process Variables
@@ -113,8 +113,8 @@ class HMIApp:
             self.signal_publisher.publish(stop_msg)
             # Update lights
             self.light1.config(fg="grey")
-            self.light2.config(fg="red")
-            self.light3.config(fg="grey")
+            self.light2.config(fg="grey")
+            self.light3.config(fg="red")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
