@@ -59,18 +59,14 @@ class HMIApp:
         self.z_coord_text.grid(row=2, column=1, padx=5)
 
         # Light Indicators
-        self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
-        self.status_indicator.pack(pady=10)
-
         self.light_frame = tk.Frame(root)
         self.light_frame.pack(pady=10)
         
-        # Set initial light colors
-        self.light1 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="Gray")
+        self.light1 = tk.Label(self.light_frame, text="Light 1", font=("Helvetica", 16), fg="orange")
         self.light1.grid(row=0, column=0, padx=5)
-        self.light2 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="Gray")
+        self.light2 = tk.Label(self.light_frame, text="Light 2", font=("Helvetica", 16), fg="orange")
         self.light2.grid(row=0, column=1, padx=5)
-        self.light3 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="orange")
+        self.light3 = tk.Label(self.light_frame, text="Light 3", font=("Helvetica", 16), fg="orange")
         self.light3.grid(row=0, column=2, padx=5)
 
         # Process Variables
@@ -100,8 +96,6 @@ class HMIApp:
             self.signal_publisher.publish(start_msg)
             # Publish selected option to ROS
             self.choice_publisher.publish(self.selected_option)
-            # Update status indicator to Running
-            self.status_indicator.config(text="Running", fg="green")
             # Update lights
             self.light1.config(fg="green")
             self.light2.config(fg="grey")
@@ -117,8 +111,6 @@ class HMIApp:
             stop_msg = Bool()
             stop_msg.data = False
             self.signal_publisher.publish(stop_msg)
-            # Update status indicator to Stopped
-            self.status_indicator.config(text="Stopped", fg="red")
             # Update lights
             self.light1.config(fg="grey")
             self.light2.config(fg="red")
@@ -127,7 +119,7 @@ class HMIApp:
     def update_slider_label(self, value):
         self.selected_option = int(value)
         # Update slider name box based on selected option
-        names = {1: "Dop_10", 2: "KleineSchroevendraaier", 3: "Schroevendraaier:", 4: "Spanningstester:", 5: "Alles Sorteren"}
+        names = {1: "Option 1", 2: "Option 2", 3: "Option 3", 4: "Option 4", 5: "Option 5"}
         name = names.get(self.selected_option, "Unknown")
         self.slider_name_box.delete(0, tk.END)
         self.slider_name_box.insert(0, name)
