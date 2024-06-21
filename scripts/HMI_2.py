@@ -87,6 +87,8 @@ class HMIApp:
             start_msg = Bool()
             start_msg.data = True
             self.signal_publisher.publish(start_msg)
+            # Publish selected option to ROS
+            self.choice_publisher.publish(self.selected_option)
             # Update status indicator to Running
             self.status_indicator.config(text="Running", fg="green")
             # Update lights
@@ -121,9 +123,6 @@ class HMIApp:
         self.slider_name_box.delete(0, tk.END)
         self.slider_name_box.insert(0, name)
 
-        # Publish selected option to ROS
-        self.choice_publisher.publish(self.selected_option)
-
     def coordinates_callback(self, msg):
         # Update the text boxes with the coordinates
         self.x_coord_text.delete(0, tk.END)
@@ -143,3 +142,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = HMIApp(root)
     root.mainloop()
+
