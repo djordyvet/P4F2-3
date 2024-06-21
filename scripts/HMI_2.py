@@ -9,44 +9,59 @@ class HMIApp:
         self.root = root
         self.root.title("HMI with Slider, Buttons, and Coordinates")
 
-        # Slider
-        self.slider_label = tk.Label(root, text="Select Option", font=("Helvetica", 14))
-        self.slider_label.pack(pady=10)
+        # Create a frame for the entire layout
+        self.main_frame = tk.Frame(root)
+        self.main_frame.pack(pady=10)
 
-        self.slider = tk.Scale(root, from_=1, to=5, orient="horizontal", command=self.update_slider_label)
-        self.slider.pack(pady=10)
+        # Left Frame for Buttons
+        self.left_frame = tk.Frame(self.main_frame)
+        self.left_frame.grid(row=0, column=0, padx=10)
 
-        self.slider_name_box = tk.Entry(root, font=("Helvetica", 14))
-        self.slider_name_box.pack(pady=10)
-
-        # Buttons
-        self.start_button = tk.Button(root, text="Start", command=self.start_process, font=("Helvetica", 12))
+        self.start_button = tk.Button(self.left_frame, text="Start", command=self.start_process, font=("Helvetica", 12))
         self.start_button.pack(pady=5)
 
-        self.stop_button = tk.Button(root, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
+        self.stop_button = tk.Button(self.left_frame, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
 
-        # Light Indicators
-        self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
-        self.status_indicator.pack(pady=10)
+        # Middle Frame for Slider
+        self.middle_frame = tk.Frame(self.main_frame)
+        self.middle_frame.grid(row=0, column=1, padx=10)
 
-        # Coordinates Text Boxes
-        self.coord_frame = tk.Frame(root)
+        self.slider_label = tk.Label(self.middle_frame, text="Select Option", font=("Helvetica", 14))
+        self.slider_label.pack(pady=10)
+
+        self.slider = tk.Scale(self.middle_frame, from_=1, to=5, orient="horizontal", command=self.update_slider_label)
+        self.slider.pack(pady=10)
+
+        self.slider_name_box = tk.Entry(self.middle_frame, font=("Helvetica", 14))
+        self.slider_name_box.pack(pady=10)
+
+        # Right Frame for Coordinates
+        self.right_frame = tk.Frame(self.main_frame)
+        self.right_frame.grid(row=0, column=2, padx=10)
+
+        self.coord_frame = tk.Frame(self.right_frame)
         self.coord_frame.pack(pady=10)
+        
         self.x_coord_label = tk.Label(self.coord_frame, text="X Coordinate:", font=("Helvetica", 12))
         self.x_coord_label.grid(row=0, column=0, padx=5)
         self.x_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
         self.x_coord_text.grid(row=0, column=1, padx=5)
+        
         self.y_coord_label = tk.Label(self.coord_frame, text="Y Coordinate:", font=("Helvetica", 12))
         self.y_coord_label.grid(row=1, column=0, padx=5)
         self.y_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
         self.y_coord_text.grid(row=1, column=1, padx=5)
+        
         self.z_coord_label = tk.Label(self.coord_frame, text="Z Coordinate:", font=("Helvetica", 12))
         self.z_coord_label.grid(row=2, column=0, padx=5)
         self.z_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
         self.z_coord_text.grid(row=2, column=1, padx=5)
 
         # Light Indicators
+        self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
+        self.status_indicator.pack(pady=10)
+
         self.light_frame = tk.Frame(root)
         self.light_frame.pack(pady=10)
         
@@ -135,5 +150,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = HMIApp(root)
     root.mainloop()
-
-
