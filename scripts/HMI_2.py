@@ -3,9 +3,6 @@ import Tkinter as tk
 import rospy
 from std_msgs.msg import Int32, Bool
 from geometry_msgs.msg import Point  # Assuming the coordinates are published as geometry_msgs/Point
-from sensor_msgs.msg import Image as RosImage
-from cv_bridge import CvBridge
-import cv2
 
 class HMIApp:
     def __init__(self, root):
@@ -26,41 +23,6 @@ class HMIApp:
         self.stop_button = tk.Button(self.left_frame, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
 
-        # Middle Frame for Slider
-        self.middle_frame = tk.Frame(self.main_frame)
-        self.middle_frame.grid(row=0, column=1, padx=10)
-
-        self.slider_label = tk.Label(self.middle_frame, text="Select Option", font=("Helvetica", 14))
-        self.slider_label.pack(pady=10)
-
-        self.slider = tk.Scale(self.middle_frame, from_=1, to=5, orient="horizontal", command=self.update_slider_label)
-        self.slider.pack(pady=10)
-
-        self.slider_name_box = tk.Entry(self.middle_frame, font=("Helvetica", 14))
-        self.slider_name_box.pack(pady=10)
-
-        # Right Frame for Coordinates
-        self.right_frame = tk.Frame(self.main_frame)
-        self.right_frame.grid(row=0, column=2, padx=10)
-
-        self.coord_frame = tk.Frame(self.right_frame)
-        self.coord_frame.pack(pady=10)
-        
-        self.x_coord_label = tk.Label(self.coord_frame, text="X Coordinate:", font=("Helvetica", 12))
-        self.x_coord_label.grid(row=0, column=0, padx=5)
-        self.x_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
-        self.x_coord_text.grid(row=0, column=1, padx=5)
-        
-        self.y_coord_label = tk.Label(self.coord_frame, text="Y Coordinate:", font=("Helvetica", 12))
-        self.y_coord_label.grid(row=1, column=0, padx=5)
-        self.y_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
-        self.y_coord_text.grid(row=1, column=1, padx=5)
-        
-        self.z_coord_label = tk.Label(self.coord_frame, text="Z Coordinate:", font=("Helvetica", 12))
-        self.z_coord_label.grid(row=2, column=0, padx=5)
-        self.z_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
-        self.z_coord_text.grid(row=2, column=1, padx=5)
-
         # Light Indicators
         self.status_indicator = tk.Label(root, text="Idle", font=("Helvetica", 20), fg="grey")
         self.status_indicator.pack(pady=10)
@@ -75,26 +37,18 @@ class HMIApp:
         self.light3 = tk.Label(self.light_frame, text="Light 3", font=("Helvetica", 16), fg="grey")
         self.light3.grid(row=0, column=2, padx=5)
 
-        # Camera View Frame
-        self.camera_frame = tk.Frame(root)
-        self.camera_frame.pack(pady=10)
-        self.camera_label = tk.Label(self.camera_frame)
-        self.camera_label.pack()
-
         # Process Variables
         self.process_running = False
-        self.bridge = CvBridge()
+
+        # Set initial light colors
+        self.update_light_colors("idle")
 
         # ROS Initialization
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
         rospy.Subscriber('coordinates', Point, self.coordinates_callback)  # Assuming the topic 'coordinates' publishes geometry_msgs/Point
-        rospy.Subscriber('/stereo_inertial_nn_publisher/color/image', RosImage, self.image_callback)
 
-        # Initialize the name box with the first option
-        self.update_slider_label("1")
-        
         # Run Tkinter main loop in a way that doesn't block ROS callbacks
         self.root.after(100, self.ros_spin)
 
@@ -104,18 +58,12 @@ class HMIApp:
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
             self.signal_publisher.publish(True)  # Publish start signal
-            # Publish start message as a ROS message
-            start_msg = Bool()
-            start_msg.data = True
-            self.signal_publisher.publish(start_msg)
             # Publish selected option to ROS
             self.choice_publisher.publish(self.selected_option)
             # Update status indicator to Running
             self.status_indicator.config(text="Running", fg="green")
             # Update lights
-            self.light1.config(fg="green")
-            self.light2.config(fg="green")
-            self.light3.config(fg="green")
+            self.update_light_colors("running")
 
     def stop_process(self):
         if self.process_running:
@@ -123,50 +71,36 @@ class HMIApp:
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
             self.signal_publisher.publish(False)  # Publish stop signal
-            # Publish stop message as a ROS message
-            stop_msg = Bool()
-            stop_msg.data = False
-            self.signal_publisher.publish(stop_msg)
             # Update status indicator to Stopped
             self.status_indicator.config(text="Stopped", fg="red")
             # Update lights
-            self.light1.config(fg="red")
-            self.light2.config(fg="red")
-            self.light3.config(fg="red")
+            self.update_light_colors("stopped")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
-        # Update slider name box based on selected option
-        names = {1: "Dop_10", 2: "KleineSchroevendraaier:", 3: "Schroevendraaier", 4: "Spanningszoeker", 5: "Alles Sorteren"}
-        name = names.get(self.selected_option, "Unknown")
-        self.slider_name_box.delete(0, tk.END)
-        self.slider_name_box.insert(0, name)
 
     def coordinates_callback(self, msg):
-        # Update the text boxes with the coordinates
-        self.x_coord_text.delete(0, tk.END)
-        self.x_coord_text.insert(0, str(msg.x))
-        self.y_coord_text.delete(0, tk.END)
-        self.y_coord_text.insert(0, str(msg.y))
-        self.z_coord_text.delete(0, tk.END)
-        self.z_coord_text.insert(0, str(msg.z))
-
-    def image_callback(self, msg):
-        # Convert ROS Image message to OpenCV image
-        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        # Convert OpenCV image to PIL image
-        pil_image = Image.fromarray(cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB))
-        # Convert PIL image to ImageTk image
-        tk_image = ImageTk.PhotoImage(image=pil_image)
-        # Update the label with the new image
-        self.camera_label.imgtk = tk_image
-        self.camera_label.configure(image=tk_image)
+        pass
 
     def ros_spin(self):
         # Allow ROS to process incoming messages
         rospy.rostime.wallsleep(0.1)
         # Call this method again after 100 ms
         self.root.after(100, self.ros_spin)
+
+    def update_light_colors(self, status):
+        if status == "idle":
+            self.light1.config(fg="grey")
+            self.light2.config(fg="grey")
+            self.light3.config(fg="orange")
+        elif status == "running":
+            self.light1.config(fg="green")
+            self.light2.config(fg="grey")
+            self.light3.config(fg="grey")
+        elif status == "stopped":
+            self.light1.config(fg="grey")
+            self.light2.config(fg="red")
+            self.light3.config(fg="grey")
 
 if __name__ == "__main__":
     root = tk.Tk()
