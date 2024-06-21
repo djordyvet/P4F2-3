@@ -11,6 +11,8 @@ from std_msgs.msg import Bool
 def HMI_Subscribers():
     rospy.init_node('hmi_signal_subscriber', anonymous=True)
     rospy.Subscriber('hmi_signal', Bool, signal_callback)
+    
+
     rospy.spin()
 #subscribers voor Vision
 
@@ -39,7 +41,34 @@ def signal_callback(msg):
     else:
         print("Received stop signal from HMI.")
         
+def choice_callback(self, msg):
+        # This function will be called every time a message is received on 'hmi_choice' topic
+        choice = msg.data
         
+        # Define actions based on the received choice using if statements
+        if choice == 1: 
+            rospy.loginfo("Sorteer: Dop_10")
+            # Add your specific action for Option 1 here
+        
+        elif choice == 2:
+            rospy.loginfo("Sorteer: KleineSchroevendraaier")
+            # Add your specific action for Option 2 here
+        
+        elif choice == 3:
+            rospy.loginfo("Sorteer: Plattekop")
+            # Add your specific action for Option 3 here
+        
+        elif choice == 4:
+            rospy.loginfo("Sorteer: Spanningstester")
+            # Add your specific action for Option 4 here
+        
+        elif choice == 5:
+            rospy.loginfo("Alles sorteren")
+            # Add your specific action for Option 5 here
+        
+        else:
+            rospy.logwarn("Received unknown option: %d", choice)
+            # Handle unexpected options or add additional logic as needed        
 
 #ontvangen en verwerken start signaal
 
