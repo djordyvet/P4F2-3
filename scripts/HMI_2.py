@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 import Tkinter as tk
+from PIL import Image, ImageTk
 import rospy
 from std_msgs.msg import Int32, Bool
 from geometry_msgs.msg import Point  # Assuming the coordinates are published as geometry_msgs/Point
+from sensor_msgs.msg import Image as RosImage
+from cv_bridge import CvBridge
+import cv2
 
 class HMIApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("HMI with Slider, Buttons, and Coordinates")
+        self.root.title("HMI with Slider, Buttons, Coordinates, and Camera View")
 
         # Create a frame for the entire layout
         self.main_frame = tk.Frame(root)
@@ -72,15 +76,23 @@ class HMIApp:
         self.light3 = tk.Label(self.light_frame, text="Light 3", font=("Helvetica", 16), fg="grey")
         self.light3.grid(row=0, column=2, padx=5)
 
+        # Camera View Frame
+        self.camera_frame = tk.Frame(root)
+        self.camera_frame.pack(pady=10)
+        self.camera_label = tk.Label(self.camera_frame)
+        self.camera_label.pack()
+
         # Process Variables
         self.process_running = False
+        self.bridge = CvBridge()
 
         # ROS Initialization
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
         rospy.Subscriber('coordinates', Point, self.coordinates_callback)  # Assuming the topic 'coordinates' publishes geometry_msgs/Point
-        
+        rospy.Subscriber('/stereo_inertial_nn_publisher/color/image', RosImage, self.image_callback)
+
         # Initialize the name box with the first option
         self.update_slider_label("1")
         
@@ -139,6 +151,17 @@ class HMIApp:
         self.y_coord_text.insert(0, str(msg.y))
         self.z_coord_text.delete(0, tk.END)
         self.z_coord_text.insert(0, str(msg.z))
+
+    def image_callback(self, msg):
+        # Convert ROS Image message to OpenCV image
+        cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        # Convert OpenCV image to PIL image
+        pil_image = Image.fromarray(cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB))
+        # Convert PIL image to ImageTk image
+        tk_image = ImageTk.PhotoImage(image=pil_image)
+        # Update the label with the new image
+        self.camera_label.imgtk = tk_image
+        self.camera_label.configure(image=tk_image)
 
     def ros_spin(self):
         # Allow ROS to process incoming messages
