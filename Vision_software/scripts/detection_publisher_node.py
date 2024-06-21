@@ -1,5 +1,12 @@
+import rospy
+from sensor_msgs.msg import Image
+from depthai_ros_msgs.msg import SpatialDetectionArray
+from cv_bridge import CvBridge
+import cv2
+import numpy as np
+
 class ObjectAngleDetector:
-    def __init__(self):
+    def _init_(self):
         # Initialize the ROS node
         rospy.init_node('object_angle_detector', anonymous=True)
 
@@ -9,9 +16,6 @@ class ObjectAngleDetector:
         # Subscribe to the image and bounding box topics
         rospy.Subscriber('/stereo_inertial_nn_publisher/color/image', Image, self.image_callback)
         rospy.Subscriber('/stereo_inertial_nn_publisher/color/detections', SpatialDetectionArray, self.detection_callback)
-
-        # Publisher for angle information
-        self.angle_pub = rospy.Publisher('/detected_object/angle', BoundingBoxAngle, queue_size=10)
 
         self.latest_image = None
         self.detections = []
@@ -49,9 +53,6 @@ class ObjectAngleDetector:
 
             # Log the angle
             rospy.loginfo("Detected angle: {:.2f} degrees".format(angle))
-
-            # Publish the angle and centroid information
-            self.publish_angle(angle, bbox.center.x, bbox.center.y)
 
             # Display the annotated cropped image
             cv2.imshow('Annotated Cropped Image', annotated_image)
@@ -97,3 +98,18 @@ class ObjectAngleDetector:
             # No lines found
             cv2.putText(annotated_image, "No lines detected", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+            return 0, annotated_image
+
+    def run(self):
+        # Keep the node running
+        rate = rospy.Rate(10)  # 10 Hz
+        while not rospy.is_shutdown():
+            self.process_detections()
+            rate.sleep()
+
+        # Close OpenCV windows on shutdown
+        cv2.destroyAllWindows()
+
+if _name_ == '_main_':
+    detector = ObjectAngleDetector()
+    detector.run()
