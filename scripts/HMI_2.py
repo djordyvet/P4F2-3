@@ -107,7 +107,7 @@ class HMIApp:
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="normal")
-            self.reset_button.config(state="normal")
+            self.reset_button.config(state="disabled")
             self.signal_publisher.publish(False)  # Publish stop signal
             # Publish stop message as a ROS message
             stop_msg = Bool()
