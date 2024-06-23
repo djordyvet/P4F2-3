@@ -110,7 +110,7 @@ class HMIApp:
             self.light2.config(text="O", fg="grey")
             self.light3.config(text="O", fg="grey")
             # Update info box
-            self.update_info_box("Process started.")
+            self.update_info_box("Process is gestart.")
 
     def stop_process(self):
         if self.process_running:
@@ -128,7 +128,7 @@ class HMIApp:
             self.light2.config(text="O", fg="grey")
             self.light3.config(text="O", fg="red")
             # Update info box
-            self.update_info_box("Process stopped.")
+            self.update_info_box("Process is gestopt.")
 
     def emergency_stop(self):
         # Handle emergency stop action
@@ -147,7 +147,7 @@ class HMIApp:
             self.light2.config(text="O", fg="red")
             self.light3.config(text="O", fg="red")
             # Update info box
-            self.update_info_box("Emergency stop activated.")
+            self.update_info_box("Noodknop is ingedrukt.")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
