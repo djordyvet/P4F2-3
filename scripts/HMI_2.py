@@ -87,7 +87,6 @@ class HMIApp:
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
             self.emergency_button.config(state="normal")
-            self.reset_button.config(state="disabled")  # Disable reset button
             self.signal_publisher.publish(True)  # Publish start signal
             # Publish start message as a ROS message
             start_msg = Bool()
@@ -127,7 +126,6 @@ class HMIApp:
             self.start_button.config(state="disabled")
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="disabled")
-            self.reset_button.config(state="disabled")  # Disable reset button
             self.signal_publisher.publish(False)  # Publish stop signal
             # Publish stop message as a ROS message
             stop_msg = Bool()
@@ -145,7 +143,6 @@ class HMIApp:
         self.start_button.config(state="normal")
         self.stop_button.config(state="disabled")
         self.emergency_button.config(state="normal")
-        self.reset_button.config(state="normal")  # Enable reset button
         # Publish reset signal if needed
         reset_msg = Bool()
         reset_msg.data = False
@@ -201,4 +198,9 @@ class HMIApp:
         # Allow ROS to process incoming messages
         rospy.rostime.wallsleep(0.1)
         # Call this method again after 100 ms
-        self
+        self.root.after(100, self.ros_spin)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = HMIApp(root)
+    root.mainloop()
