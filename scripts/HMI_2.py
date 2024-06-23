@@ -57,6 +57,7 @@ class HMIApp:
 
         self.process_running = False
         self.emergency_active = False
+        self.blinking = False
 
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
@@ -97,6 +98,7 @@ class HMIApp:
             self.stop_button.config(state="disabled")
             self.reset_button.config(state="normal")
             self.signal_publisher.publish(Bool(data=False))
+            self.blinking = True
             self.blink_lights()
             self.update_info_box("Noodknop is ingedrukt.")
 
@@ -115,7 +117,7 @@ class HMIApp:
             self.update_info_box("Klaar om signaal te ontvangen.")
 
     def blink_lights(self):
-        if self.emergency_active:
+        if self.blinking:
             current_color1 = self.light1.cget("fg")
             next_color1 = "red" if current_color1 == "grey" else "grey"
             current_color3 = self.light3.cget("fg")
@@ -124,18 +126,15 @@ class HMIApp:
             self.light1.config(fg=next_color1)
             self.light3.config(fg=next_color3)
             
-            # Turn off middle light before blinking
-            self.light2.config(fg="grey")
-            
-            # Schedule inside light to change color after the outer lights
-            self.root.after(500, self.blink_inside_light)
+            self.root.after(500, self.blink_lights)
 
     def blink_inside_light(self):
-        if self.emergency_active:
+        if self.blinking:
             current_color2 = self.light2.cget("fg")
             next_color2 = "red" if current_color2 == "grey" else "grey"
             
             self.light2.config(fg=next_color2)
+            self.root.after(500, self.blink_inside_light)
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
