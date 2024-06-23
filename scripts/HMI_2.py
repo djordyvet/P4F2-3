@@ -23,7 +23,7 @@ class HMIApp:
         self.stop_button = tk.Button(self.left_frame, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
 
-        self.reset_button = tk.Button(self.left_frame, text="Reset", command=self.reset_process, font=("Helvetica", 12), state="disabled")
+        self.reset_button = tk.Button(self.left_frame, text="Reset", command=self.reset_process, font=("Helvetica", 12))
         self.reset_button.pack(pady=5)
 
         self.emergency_button = tk.Button(self.left_frame, text="Noodstop", command=self.emergency_stop, font=("Helvetica", 12), fg="red")
@@ -56,7 +56,7 @@ class HMIApp:
         
         self.light1 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="grey")
         self.light1.grid(row=0, column=0, padx=5)
-        self.light2 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="orange")
+        self.light2 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="Orange")
         self.light2.grid(row=0, column=1, padx=5)
         self.light3 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="grey")
         self.light3.grid(row=0, column=2, padx=5)
@@ -86,9 +86,12 @@ class HMIApp:
             self.process_running = True
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
-            self.reset_button.config(state="disabled")  # Disable Reset button when process is running
             self.emergency_button.config(state="normal")
             self.signal_publisher.publish(True)  # Publish start signal
+            # Publish start message as a ROS message
+            start_msg = Bool()
+            start_msg.data = True
+            self.signal_publisher.publish(start_msg)
             # Publish selected option to ROS
             self.choice_publisher.publish(self.selected_option)
             # Update lights
@@ -103,9 +106,12 @@ class HMIApp:
             self.process_running = False
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
-            self.reset_button.config(state="normal")  # Enable Reset button when process stops
             self.emergency_button.config(state="normal")
             self.signal_publisher.publish(False)  # Publish stop signal
+            # Publish stop message as a ROS message
+            stop_msg = Bool()
+            stop_msg.data = False
+            self.signal_publisher.publish(stop_msg)
             # Update lights
             self.light1.config(text="O", fg="grey")
             self.light2.config(text="O", fg="grey")
@@ -119,37 +125,40 @@ class HMIApp:
             self.process_running = False
             self.start_button.config(state="disabled")
             self.stop_button.config(state="disabled")
-            self.reset_button.config(state="normal")  # Enable Reset button when emergency stopped
             self.emergency_button.config(state="disabled")
             self.signal_publisher.publish(False)  # Publish stop signal
+            # Publish stop message as a ROS message
+            stop_msg = Bool()
+            stop_msg.data = False
+            self.signal_publisher.publish(stop_msg)
             # Start blinking lights
             self.blink_lights()
             # Update info box
             self.update_info_box("Noodknop is ingedrukt.")
 
     def reset_process(self):
-        # Reset the interface to initial state only if the process is not running
-        if not self.process_running:
-            self.emergency_active = False
-            self.start_button.config(state="normal")
-            self.stop_button.config(state="disabled")
-            self.reset_button.config(state="disabled")
-            # Publish reset signal if needed
-            reset_msg = Bool()
-            reset_msg.data = False
-            self.signal_publisher.publish(reset_msg)
-            # Reset lights
-            self.light1.config(text="O", fg="grey")
-            self.light2.config(text="O", fg="orange")
-            self.light3.config(text="O", fg="grey")
-            # Clear the info box
-            self.info_box.delete(1.0, tk.END)
-            # Reset slider to initial state
-            self.slider.set(1)
-            self.update_slider_label("1")
-            # Update info box
-            self.update_info_box("Interface is gereset.")
-            self.update_info_box("Klaar om signaal te ontvangen.")
+        # Reset the interface to initial state
+        self.process_running = False
+        self.emergency_active = False
+        self.start_button.config(state="normal")
+        self.stop_button.config(state="disabled")
+        self.emergency_button.config(state="normal")
+        # Publish reset signal if needed
+        reset_msg = Bool()
+        reset_msg.data = False
+        self.signal_publisher.publish(reset_msg)
+        # Reset lights
+        self.light1.config(text="O", fg="grey")
+        self.light2.config(text="O", fg="orange")
+        self.light3.config(text="O", fg="grey")
+        # Clear the info box
+        self.info_box.delete(1.0, tk.END)
+        # Reset slider to initial state
+        self.slider.set(1)
+        self.update_slider_label("1")
+        # Update info box
+        self.update_info_box("Interface is gereset.")
+        self.update_info_box("Klaar om signaal te ontvangen.")
 
     def blink_lights(self):
         if self.emergency_active:
@@ -194,4 +203,4 @@ class HMIApp:
 if __name__ == "__main__":
     root = tk.Tk()
     app = HMIApp(root)
-    root
+    root.mainloop()
