@@ -69,8 +69,8 @@ class HMIApp:
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('/hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('/hmi_signal', Bool, queue_size=10)
+        self.emergency_publisher = rospy.Publisher('/hmi_emergency', Bool, queue_size=10)
         
-
         # Initialize the name box with the first option
         self.update_slider_label("1")
         
@@ -120,7 +120,7 @@ class HMIApp:
             # Update info box
             self.update_info_box("Proces is gestopt.")
 
-    def emergency_stop(self):
+     def emergency_stop(self):
         if not self.emergency_active:
             self.emergency_active = True
             self.process_running = False
@@ -133,6 +133,10 @@ class HMIApp:
             stop_msg = Bool()
             stop_msg.data = False
             self.signal_publisher.publish(stop_msg)
+            # Publish emergency stop signal
+            emergency_msg = Bool()
+            emergency_msg.data = True
+            self.emergency_publisher.publish(emergency_msg)
             # Start blinking lights
             self.blink_lights()
             # Update info box
