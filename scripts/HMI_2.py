@@ -83,6 +83,7 @@ class HMIApp:
     def start_process(self):
         if not self.process_running and not self.emergency_active:
             self.process_running = True
+            # Button config
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
             self.emergency_button.config(state="normal")
@@ -104,6 +105,7 @@ class HMIApp:
     def stop_process(self):
         if self.process_running and not self.emergency_active:
             self.process_running = False
+            # Button config
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="normal")
@@ -124,6 +126,7 @@ class HMIApp:
         if not self.emergency_active:
             self.emergency_active = True
             self.process_running = False
+            # Button config
             self.start_button.config(state="disabled")
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="disabled")
@@ -142,6 +145,7 @@ class HMIApp:
             # Reset the interface to initial state
             self.process_running = False
             self.emergency_active = False
+            # Button config
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="disabled")
