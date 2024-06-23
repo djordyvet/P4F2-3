@@ -50,7 +50,7 @@ class HMIApp:
 
         self.light1 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="grey")
         self.light1.grid(row=0, column=0, padx=5)
-        self.light2 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="orange")
+        self.light2 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="grey")
         self.light2.grid(row=0, column=1, padx=5)
         self.light3 = tk.Label(self.light_frame, text="O", font=("Helvetica", 16), fg="grey")
         self.light3.grid(row=0, column=2, padx=5)
@@ -99,7 +99,7 @@ class HMIApp:
             self.reset_button.config(state="normal")
             self.signal_publisher.publish(Bool(data=False))
             self.blinking = True
-            self.blink_lights()
+            self.blink_red_lights()
             self.update_info_box("Noodknop is ingedrukt.")
 
     def reset_process(self):
@@ -109,32 +109,27 @@ class HMIApp:
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
             self.signal_publisher.publish(Bool(data=False))
-            self.update_lights("grey", "orange", "grey")
+            self.update_lights("grey", "grey", "grey")
             self.info_box.delete(1.0, tk.END)
             self.slider.set(1)
             self.update_slider_label("1")
             self.update_info_box("Interface is gereset.")
             self.update_info_box("Klaar om signaal te ontvangen.")
 
-    def blink_lights(self):
+    def blink_red_lights(self):
         if self.blinking:
             current_color1 = self.light1.cget("fg")
             next_color1 = "red" if current_color1 == "grey" else "grey"
-            current_color3 = self.light3.cget("fg")
-            next_color3 = "red" if current_color3 == "grey" else "grey"
-            
-            self.light1.config(fg=next_color1)
-            self.light3.config(fg=next_color3)
-            
-            self.root.after(500, self.blink_lights)
-
-    def blink_inside_light(self):
-        if self.blinking:
             current_color2 = self.light2.cget("fg")
             next_color2 = "red" if current_color2 == "grey" else "grey"
-            
+            current_color3 = self.light3.cget("fg")
+            next_color3 = "red" if current_color3 == "grey" else "grey"
+
+            self.light1.config(fg=next_color1)
             self.light2.config(fg=next_color2)
-            self.root.after(500, self.blink_inside_light)
+            self.light3.config(fg=next_color3)
+
+            self.root.after(500, self.blink_red_lights)
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
