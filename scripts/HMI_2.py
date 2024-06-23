@@ -67,10 +67,9 @@ class HMIApp:
 
         # ROS Initialization
         rospy.init_node('hmi_publisher', anonymous=True)
-        self.choice_publisher = rospy.Publisher('hmi_choice', Int32, queue_size=10)
-        self.signal_publisher = rospy.Publisher('hmi_signal', Bool, queue_size=10)
-        rospy.Subscriber('coordinates', Point, self.coordinates_callback)  # Assuming the topic 'coordinates' publishes geometry_msgs/Point
-        self.xyz_publisher = rospy.Publisher('xyz_position', Float32MultiArray, queue_size=10)
+        self.choice_publisher = rospy.Publisher('/hmi_choice', Int32, queue_size=10)
+        self.signal_publisher = rospy.Publisher('/hmi_signal', Bool, queue_size=10)
+        
 
         # Initialize the name box with the first option
         self.update_slider_label("1")
@@ -186,11 +185,6 @@ class HMIApp:
         name = names.get(self.selected_option, "Unknown")
         self.slider_name_box.delete(0, tk.END)
         self.slider_name_box.insert(0, name)
-
-    def coordinates_callback(self, msg):
-        # Update info box with the coordinates
-        coordinates_message = "Coordinates received: X={}, Y={}, Z={}".format(msg.x, msg.y, msg.z)
-        self.update_info_box(coordinates_message)
 
     def update_info_box(self, message):
         # Append a message to the info box
