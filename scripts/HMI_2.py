@@ -137,8 +137,8 @@ class HMIApp:
             self.update_info_box("Noodknop is ingedrukt.")
 
     def reset_process(self):
-        # Reset the interface to initial state
-        self.process_running = False
+    # Reset the interface to initial state only if the process is not running
+    if not self.process_running:
         self.emergency_active = False
         self.start_button.config(state="normal")
         self.stop_button.config(state="disabled")
@@ -159,6 +159,7 @@ class HMIApp:
         # Update info box
         self.update_info_box("Interface is gereset.")
         self.update_info_box("Klaar om signaal te ontvangen.")
+
 
     def blink_lights(self):
         if self.emergency_active:
