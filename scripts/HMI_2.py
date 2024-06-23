@@ -139,25 +139,29 @@ class HMIApp:
             self.update_info_box("Noodknop is ingedrukt.")
 
     def reset_process(self):
-        # Reset the interface to initial state
-        self.process_running = False
-        self.emergency_active = False
-        self.start_button.config(state="normal")
-        self.stop_button.config(state="disabled")
-        self.emergency_button.config(state="normal")
-        self.reset_button.config(state="normal")
-        # Reset lights
-        self.light1.config(text="O", fg="grey")
-        self.light2.config(text="O", fg="orange")
-        self.light3.config(text="O", fg="grey")
-        # Clear the info box
-        self.info_box.delete(1.0, tk.END)
-        # Reset slider to initial state
-        self.slider.set(1)
-        self.update_slider_label("1")
-        # Update info box
-        self.update_info_box("Interface is gereset.")
-        self.update_info_box("Klaar om signaal te ontvangen.")
+            # Reset the interface to initial state
+            self.process_running = False
+            self.emergency_active = False
+            self.start_button.config(state="normal")
+            self.stop_button.config(state="disabled")
+            self.emergency_button.config(state="normal")
+            self.reset_button.config(state="normal")
+            # Publish stop message as a ROS message
+            nood_msg = Bool()
+            nood_msg.data = false 
+            self.signal_publisher.publish(nood_msg)
+            # Reset lights
+            self.light1.config(text="O", fg="grey")
+            self.light2.config(text="O", fg="orange")
+            self.light3.config(text="O", fg="grey")
+            # Clear the info box
+            self.info_box.delete(1.0, tk.END)
+            # Reset slider to initial state
+            self.slider.set(1)
+            self.update_slider_label("1")
+            # Update info box
+            self.update_info_box("Interface is gereset.")
+            self.update_info_box("Klaar om signaal te ontvangen.")
 
     def blink_lights(self):
         if self.emergency_active:
