@@ -144,7 +144,7 @@ class HMIApp:
             self.emergency_active = False
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
-            self.emergency_button.config(state="normal")
+            self.emergency_button.config(state="disabled")
             self.nood_button.config(state="normal")
             # Publish stop message as a ROS message
             nood_msg = Bool()
