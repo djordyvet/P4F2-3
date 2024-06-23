@@ -21,7 +21,7 @@ class HMIApp:
         self.stop_button = tk.Button(self.left_frame, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
 
-        self.reset_button = tk.Button(self.left_frame, text="Reset", command=self.reset_process, font=("Helvetica", 12))
+        self.reset_button = tk.Button(self.left_frame, text="Reset", command=self.reset_process, font=("Helvetica", 12), state="normal")
         self.reset_button.pack(pady=5)
 
         self.emergency_button = tk.Button(self.left_frame, text="Noodstop", command=self.emergency_stop, font=("Helvetica", 12), fg="red")
@@ -73,6 +73,7 @@ class HMIApp:
             self.process_running = True
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
+            self.reset_button.config(state="disabled")
             self.signal_publisher.publish(Bool(data=True))
             self.choice_publisher.publish(self.selected_option)
             self.update_lights("green", "grey", "grey")
@@ -83,6 +84,7 @@ class HMIApp:
             self.process_running = False
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
+            self.reset_button.config(state="normal")
             self.signal_publisher.publish(Bool(data=False))
             self.update_lights("grey", "grey", "red")
             self.update_info_box("Proces is gestopt.")
@@ -93,22 +95,24 @@ class HMIApp:
             self.process_running = False
             self.start_button.config(state="disabled")
             self.stop_button.config(state="disabled")
+            self.reset_button.config(state="normal")
             self.signal_publisher.publish(Bool(data=False))
             self.blink_lights()
             self.update_info_box("Noodknop is ingedrukt.")
 
     def reset_process(self):
-        self.process_running = False
-        self.emergency_active = False
-        self.start_button.config(state="normal")
-        self.stop_button.config(state="disabled")
-        self.signal_publisher.publish(Bool(data=False))
-        self.update_lights("grey", "orange", "grey")
-        self.info_box.delete(1.0, tk.END)
-        self.slider.set(1)
-        self.update_slider_label("1")
-        self.update_info_box("Interface is gereset.")
-        self.update_info_box("Klaar om signaal te ontvangen.")
+        if not self.process_running:
+            self.process_running = False
+            self.emergency_active = False
+            self.start_button.config(state="normal")
+            self.stop_button.config(state="disabled")
+            self.signal_publisher.publish(Bool(data=False))
+            self.update_lights("grey", "orange", "grey")
+            self.info_box.delete(1.0, tk.END)
+            self.slider.set(1)
+            self.update_slider_label("1")
+            self.update_info_box("Interface is gereset.")
+            self.update_info_box("Klaar om signaal te ontvangen.")
 
     def blink_lights(self):
         if self.emergency_active:
