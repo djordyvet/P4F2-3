@@ -160,7 +160,6 @@ class HMIApp:
         self.update_info_box("Interface is gereset.")
         self.update_info_box("Klaar om signaal te ontvangen.")
 
-
     def blink_lights(self):
         if self.emergency_active:
             current_color1 = self.light1.cget("fg")
