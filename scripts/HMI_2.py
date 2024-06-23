@@ -143,8 +143,8 @@ class HMIApp:
             stop_msg.data = False
             self.signal_publisher.publish(stop_msg)
             # Update lights
-            self.light1.config(text="O", fg="grey")
-            self.light2.config(text="O", fg="grey")
+            self.light1.config(text="O", fg="red")
+            self.light2.config(text="O", fg="red")
             self.light3.config(text="O", fg="red")
             # Update info box
             self.update_info_box("Emergency stop activated.")
