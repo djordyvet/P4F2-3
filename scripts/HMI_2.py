@@ -140,7 +140,7 @@ class HMIApp:
         # Reset the interface to initial state
         self.process_running = False
         self.emergency_active = False
-        self.start_button.config(state="normal")
+        self.start_button.config(state="disabled")
         self.stop_button.config(state="disabled")
         self.emergency_button.config(state="normal")
         # Publish reset signal if needed
