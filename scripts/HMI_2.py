@@ -25,6 +25,9 @@ class HMIApp:
 
         self.emergency_button = tk.Button(self.left_frame, text="Noodstop", command=self.emergency_stop, font=("Helvetica", 12), fg="red")
         self.emergency_button.pack(pady=5)
+        
+        self.reset_button = tk.Button(self.left_frame, text="Reset", command=self.reset_process, font=("Helvetica", 12))
+        self.reset_button.pack(pady=5)
 
         # Middle Frame for Slider
         self.middle_frame = tk.Frame(self.main_frame)
@@ -148,6 +151,32 @@ class HMIApp:
             self.light3.config(text="O", fg="red")
             # Update info box
             self.update_info_box("Noodknop is ingedrukt.")
+    
+    def reset_process(self):
+        # Reset the interface to initial state
+        self.process_running = False
+        self.start_button.config(state="normal")
+        self.stop_button.config(state="disabled")
+        self.emergency_button.config(state="normal")
+        # Publish reset signal if needed
+        reset_msg = Bool()
+        reset_msg.data = False
+        self.signal_publisher.publish(reset_msg)
+        # Reset lights
+        self.light1.config(text="O", fg="grey")
+        self.light2.config(text="O", fg="orange")
+        self.light3.config(text="O", fg="grey")
+        # Clear the info box
+        self.info_box.delete(1.0, tk.END)
+        # Reset slider to initial state
+        self.slider.set(1)
+        self.update_slider_label("1")
+        # Clear coordinates
+        self.x_coord_text.delete(0, tk.END)
+        self.y_coord_text.delete(0, tk.END)
+        self.z_coord_text.delete(0, tk.END)
+        # Update info box
+        self.update_info_box("Interface is gereset.")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
