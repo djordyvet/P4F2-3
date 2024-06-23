@@ -146,10 +146,6 @@ class HMIApp:
         self.stop_button.config(state="disabled")
         self.emergency_button.config(state="normal")
         self.reset_button.config(state="normal")
-        # Publish reset signal if needed
-        reset_msg = Bool()
-        reset_msg.data = False
-        self.signal_publisher.publish(reset_msg)
         # Reset lights
         self.light1.config(text="O", fg="grey")
         self.light2.config(text="O", fg="orange")
