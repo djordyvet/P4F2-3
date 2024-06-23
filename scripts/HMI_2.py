@@ -166,7 +166,7 @@ class HMIApp:
 
     def coordinates_callback(self, msg):
         # Update info box with the coordinates
-        coordinates_message = f"Coordinates received: X={msg.x}, Y={msg.y}, Z={msg.z}"
+        coordinates_message = "Coordinates received: X={}, Y={}, Z={}".format(msg.x, msg.y, msg.z)
         self.update_info_box(coordinates_message)
 
     def update_info_box(self, message):
