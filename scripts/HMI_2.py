@@ -63,6 +63,7 @@ class HMIApp:
 
         # Process Variables
         self.process_running = False
+        self.emergency_active = False
 
         # ROS Initialization
         rospy.init_node('hmi_publisher', anonymous=True)
@@ -81,7 +82,7 @@ class HMIApp:
         self.root.after(100, self.ros_spin)
 
     def start_process(self):
-        if not self.process_running:
+        if not self.process_running and not self.emergency_active:
             self.process_running = True
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
@@ -101,11 +102,11 @@ class HMIApp:
             self.update_info_box("Proces is gestart.")
 
     def stop_process(self):
-        if self.process_running:
+        if self.process_running and not self.emergency_active:
             self.process_running = False
             self.start_button.config(state="normal")
             self.stop_button.config(state="disabled")
-            self.emergency_button.config(state="disabled")
+            self.emergency_button.config(state="normal")
             self.signal_publisher.publish(False)  # Publish stop signal
             # Publish stop message as a ROS message
             stop_msg = Bool()
@@ -119,10 +120,10 @@ class HMIApp:
             self.update_info_box("Proces is gestopt.")
 
     def emergency_stop(self):
-        # Handle emergency stop action
-        if self.process_running:
+        if not self.emergency_active:
+            self.emergency_active = True
             self.process_running = False
-            self.start_button.config(state="normal")
+            self.start_button.config(state="disabled")
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="disabled")
             self.signal_publisher.publish(False)  # Publish stop signal
@@ -130,16 +131,15 @@ class HMIApp:
             stop_msg = Bool()
             stop_msg.data = False
             self.signal_publisher.publish(stop_msg)
-            # Update lights
-            self.light1.config(text="O", fg="red")
-            self.light2.config(text="O", fg="red")
-            self.light3.config(text="O", fg="red")
+            # Start blinking lights
+            self.blink_lights()
             # Update info box
             self.update_info_box("Noodknop is ingedrukt.")
-    
+
     def reset_process(self):
         # Reset the interface to initial state
         self.process_running = False
+        self.emergency_active = False
         self.start_button.config(state="normal")
         self.stop_button.config(state="disabled")
         self.emergency_button.config(state="normal")
@@ -159,6 +159,21 @@ class HMIApp:
         # Update info box
         self.update_info_box("Interface is gereset.")
         self.update_info_box("Klaar om signaal te ontvangen.")
+
+    def blink_lights(self):
+        if self.emergency_active:
+            current_color1 = self.light1.cget("fg")
+            next_color1 = "red" if current_color1 == "grey" else "grey"
+            current_color2 = self.light2.cget("fg")
+            next_color2 = "red" if current_color2 == "grey" else "grey"
+            current_color3 = self.light3.cget("fg")
+            next_color3 = "red" if current_color3 == "grey" else "grey"
+            
+            self.light1.config(fg=next_color1)
+            self.light2.config(fg=next_color2)
+            self.light3.config(fg=next_color3)
+            
+            self.root.after(500, self.blink_lights)  # Toggle color every 500ms
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
