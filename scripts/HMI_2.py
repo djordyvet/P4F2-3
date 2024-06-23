@@ -74,6 +74,9 @@ class HMIApp:
         # Initialize the name box with the first option
         self.update_slider_label("1")
         
+        # Display initial message
+        self.update_info_box("Klaar om signaal te ontvangen.")
+
         # Run Tkinter main loop in a way that doesn't block ROS callbacks
         self.root.after(100, self.ros_spin)
 
@@ -155,6 +158,7 @@ class HMIApp:
         self.update_slider_label("1")
         # Update info box
         self.update_info_box("Interface is gereset.")
+        self.update_info_box("Klaar om signaal te ontvangen.")
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
