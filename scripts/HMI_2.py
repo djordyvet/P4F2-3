@@ -117,17 +117,25 @@ class HMIApp:
     def blink_lights(self):
         if self.emergency_active:
             current_color1 = self.light1.cget("fg")
-            next_color1 = "red" if current_color1 == "grey" else "red"
-            current_color2 = self.light2.cget("fg")
-            next_color2 = "grey" if current_color2 == "red" else "grey"
+            next_color1 = "grey" if current_color1 == "red" else "red"
             current_color3 = self.light3.cget("fg")
-            next_color3 = "red" if current_color3 == "grey" else "red"
+            next_color3 = "grey" if current_color3 == "red" else "red"
             
             self.light1.config(fg=next_color1)
-            self.light2.config(fg=next_color2)
             self.light3.config(fg=next_color3)
             
+            # Schedule inside light to change color after the outer lights
+            self.root.after(250, self.blink_inside_light)
+
+            # Continue blinking the lights
             self.root.after(500, self.blink_lights)
+
+    def blink_inside_light(self):
+        if self.emergency_active:
+            current_color2 = self.light2.cget("fg")
+            next_color2 = "grey" if current_color2 == "red" else "red"
+            
+            self.light2.config(fg=next_color2)
 
     def update_slider_label(self, value):
         self.selected_option = int(value)
