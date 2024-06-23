@@ -1,7 +1,6 @@
 import tkinter as tk
 import rospy
 from std_msgs.msg import Int32, Bool
-from geometry_msgs.msg import Point
 from std_msgs.msg import Float32MultiArray
 
 class HMIApp:
