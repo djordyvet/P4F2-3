@@ -110,7 +110,7 @@ class HMIApp:
             self.light2.config(text="O", fg="grey")
             self.light3.config(text="O", fg="grey")
             # Update info box
-            self.update_info_box("Process is gestart.")
+            self.update_info_box("Proces is gestart.")
 
     def stop_process(self):
         if self.process_running:
@@ -128,7 +128,7 @@ class HMIApp:
             self.light2.config(text="O", fg="grey")
             self.light3.config(text="O", fg="red")
             # Update info box
-            self.update_info_box("Process is gestopt.")
+            self.update_info_box("Proces is gestopt.")
 
     def emergency_stop(self):
         # Handle emergency stop action
