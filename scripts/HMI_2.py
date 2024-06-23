@@ -130,9 +130,9 @@ class HMIApp:
             self.reset_button.config(state="normal")
             self.nood_publisher.publish(False)  # Publish stop signal
             # Publish stop message as a ROS message
-            stop_msg = Bool()
-            stop_msg.data = False_2
-            self.signal_publisher.publish(stop_msg)
+            nood_msg = Bool()
+            nood_msg=.data = True
+            self.signal_publisher.publish(nood_msg)
             # Start blinking lights
             self.blink_lights()
             # Update info box
