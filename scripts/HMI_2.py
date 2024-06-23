@@ -86,7 +86,7 @@ class HMIApp:
             self.process_running = True
             self.start_button.config(state="disabled")
             self.stop_button.config(state="normal")
-            self.emergency_button.config(state="normal")
+            self.emergency_button.config(state="disabled")
             self.signal_publisher.publish(True)  # Publish start signal
             # Publish start message as a ROS message
             start_msg = Bool()
@@ -140,7 +140,7 @@ class HMIApp:
         # Reset the interface to initial state
         self.process_running = False
         self.emergency_active = False
-        self.start_button.config(state="disabled")
+        self.start_button.config(state="normal")
         self.stop_button.config(state="disabled")
         self.emergency_button.config(state="normal")
         # Publish reset signal if needed
