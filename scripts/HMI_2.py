@@ -69,7 +69,7 @@ class HMIApp:
         rospy.init_node('hmi_publisher', anonymous=True)
         self.choice_publisher = rospy.Publisher('/hmi_choice', Int32, queue_size=10)
         self.signal_publisher = rospy.Publisher('/hmi_signal', Bool, queue_size=10)
-        
+        self.nood_publisher = rospy.Publisher('/nood_signal', Bool, queue_size=10)
 
         # Initialize the name box with the first option
         self.update_slider_label("1")
@@ -128,7 +128,7 @@ class HMIApp:
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="disabled")
             self.reset_button.config(state="normal")
-            self.signal_publisher.publish(False)  # Publish stop signal
+            self.nood_publisher.publish(False)  # Publish stop signal
             # Publish stop message as a ROS message
             stop_msg = Bool()
             stop_msg.data = False_2
