@@ -23,11 +23,11 @@ class HMIApp:
         self.stop_button = tk.Button(self.left_frame, text="Stop", command=self.stop_process, font=("Helvetica", 12), state="disabled")
         self.stop_button.pack(pady=5)
 
-        self.emergency_button = tk.Button(self.left_frame, text="Noodstop", command=self.emergency_stop, font=("Helvetica", 12), fg="red")
-        self.emergency_button.pack(pady=5)
-        
         self.reset_button = tk.Button(self.left_frame, text="Reset", command=self.reset_process, font=("Helvetica", 12))
         self.reset_button.pack(pady=5)
+
+        self.emergency_button = tk.Button(self.left_frame, text="Noodstop", command=self.emergency_stop, font=("Helvetica", 12), fg="red")
+        self.emergency_button.pack(pady=5)
 
         # Middle Frame for Slider
         self.middle_frame = tk.Frame(self.main_frame)
@@ -42,30 +42,12 @@ class HMIApp:
         self.slider_name_box = tk.Entry(self.middle_frame, font=("Helvetica", 14))
         self.slider_name_box.pack(pady=10)
 
-        # Right Frame for Coordinates and Info Box
+        # Right Frame for Info Box
         self.right_frame = tk.Frame(self.main_frame)
         self.right_frame.grid(row=0, column=2, padx=10)
 
-        self.coord_frame = tk.Frame(self.right_frame)
-        self.coord_frame.pack(pady=10)
-        
-        self.x_coord_label = tk.Label(self.coord_frame, text="X Coordinate:", font=("Helvetica", 12))
-        self.x_coord_label.grid(row=0, column=0, padx=5)
-        self.x_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
-        self.x_coord_text.grid(row=0, column=1, padx=5)
-        
-        self.y_coord_label = tk.Label(self.coord_frame, text="Y Coordinate:", font=("Helvetica", 12))
-        self.y_coord_label.grid(row=1, column=0, padx=5)
-        self.y_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
-        self.y_coord_text.grid(row=1, column=1, padx=5)
-        
-        self.z_coord_label = tk.Label(self.coord_frame, text="Z Coordinate:", font=("Helvetica", 12))
-        self.z_coord_label.grid(row=2, column=0, padx=5)
-        self.z_coord_text = tk.Entry(self.coord_frame, font=("Helvetica", 12))
-        self.z_coord_text.grid(row=2, column=1, padx=5)
-
         # Info Box
-        self.info_box = tk.Text(self.right_frame, height=5, width=30, font=("Helvetica", 12))
+        self.info_box = tk.Text(self.right_frame, height=10, width=30, font=("Helvetica", 12))
         self.info_box.pack(pady=10)
 
         # Light Indicators
@@ -171,10 +153,6 @@ class HMIApp:
         # Reset slider to initial state
         self.slider.set(1)
         self.update_slider_label("1")
-        # Clear coordinates
-        self.x_coord_text.delete(0, tk.END)
-        self.y_coord_text.delete(0, tk.END)
-        self.z_coord_text.delete(0, tk.END)
         # Update info box
         self.update_info_box("Interface is gereset.")
 
@@ -187,13 +165,9 @@ class HMIApp:
         self.slider_name_box.insert(0, name)
 
     def coordinates_callback(self, msg):
-        # Update the text boxes with the coordinates
-        self.x_coord_text.delete(0, tk.END)
-        self.x_coord_text.insert(0, str(msg.x))
-        self.y_coord_text.delete(0, tk.END)
-        self.y_coord_text.insert(0, str(msg.y))
-        self.z_coord_text.delete(0, tk.END)
-        self.z_coord_text.insert(0, str(msg.z))
+        # Update info box with the coordinates
+        coordinates_message = f"Coordinates received: X={msg.x}, Y={msg.y}, Z={msg.z}"
+        self.update_info_box(coordinates_message)
 
     def update_info_box(self, message):
         # Append a message to the info box
