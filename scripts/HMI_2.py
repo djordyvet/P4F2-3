@@ -128,7 +128,7 @@ class HMIApp:
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="disabled")
             self.reset_button.config(state="normal")
-            self.nood_publisher.publish(False)  # Publish stop signal
+            self.nood_publisher.publish(True)  # Publish stop signal
             # Publish stop message as a ROS message
             nood_msg = Bool()
             nood_msg.data = True
@@ -146,6 +146,7 @@ class HMIApp:
             self.stop_button.config(state="disabled")
             self.emergency_button.config(state="disabled")
             self.reset_button.config(state="disabled")
+            self.nood_publisher.publish(False)  # Publish stop signal
             # Publish stop message as a ROS message
             nood_msg = Bool()
             nood_msg.data = False 
