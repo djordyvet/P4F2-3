@@ -21,3 +21,4 @@ x-terminal-emulator -e bash -c "cd niryo_robot_ws; source devel/setup.bash;rosto
 
 # Open a new terminal using x-terminal-emulator and execute commands
 x-terminal-emulator -e bash -c "echo 'Hello from the new terminal'; ls;"
+
