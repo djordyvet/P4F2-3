@@ -1,0 +1,7 @@
+bool start  #startsignaal
+---
+
+float64 x #x-coördinaat
+float64 y #y-coördinaat
+float32 angle #angle
+int32 type #object type
